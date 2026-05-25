@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>光學計算機 V3</title>
+
+<style>
+body{
+    margin:0;
+    background:#d7d7d4;
+    font-family:"BIZ UDPGothic","Noto Sans TC",sans-serif;
+    color:#333;
+}
+
+.container{
+    max-width:1400px;
+    margin:auto;
+    padding:24px;
+}
+
+h1{
+    margin-bottom:24px;
+}
+
+.tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+}
+
+.tab-btn{
+    background:#efefed;
+    border:none;
+    border-radius:12px;
+    padding:12px 20px;
+    cursor:pointer;
+    font-size:15px;
+}
+
+.tab-btn:hover{
+    background:#dcdcd9;
+}
+
+.tab{
+    display:none;
+}
+
+.tab.active{
+    display:block;
+}
+
+.card{
+    background:#f4f4f2;
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px;
+}
+
+.input-group{
+    display:flex;
+    flex-direction:column;
+}
+
+label{
+    margin-bottom:6px;
+    font-size:14px;
+}
+
+input,select{
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    background:white;
+}
+
+.result{
+    margin-top:18px;
+    background:#e8e8e6;
+    border-radius:12px;
+    padding:16px;
+    line-height:1.9;
+}
+
+.copy-btn{
+    margin-top:15px;
+}
+
+.small{
+    font-size:13px;
+    color:#666;
+}
+</style>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#d7d7d4">
+
+<script>
+if ('serviceWorker' in navigator) {
+window.addEventListener('load',()=>{
+navigator.serviceWorker.register('./service-worker.js');
+});
+}
+</script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>光學計算機 V3</h1>
+
+<div class="tabs">
+<button class="tab-btn" onclick="showTab('basic')">基本計算</button>
+<button class="tab-btn" onclick="showTab('vision')">Vision</button>
+<button class="tab-btn" onclick="showTab('encoder')">Encoder</button>
+</div>
+
+<div id="basic" class="tab active">
+
+<div class="card">
+<h2>長度 / 時間 / Hz 換算</h2>
+
+<div class="grid">
+
+<div class="input-group">
+<label>長度</label>
+<input type="number" id="lengthValue" value="1">
+</div>
+
+<div class="input-group">
+<label>長度單位</label>
+<select id="lengthUnit">
+<option value="m">m</option>
+<option value="cm">cm</option>
+<option value="mm" selected>mm</option>
+<option value="um">um</option>
+</select>
+</div>
+
+<div class="input-group">
+<label>時間</label>
+<input type="number" id="timeValue" value="1">
+</div>
+
+<div class="input-group">
+<label>時間單位</label>
+<select id="timeUnit">
+<option value="s">s</option>
+<option value="ms" selected>ms</option>
+<option value="us">us</option>
+</select>
+</div>
+
+<div class="input-group">
+<label>Hz</label>
+<input type="number" id="hzValue" value="1000">
+</div>
+
+</div>
+
+<div class="result" id="basicResult"></div>
+
+</div>
+
+</div>
+
+<div id="vision" class="tab">
+
+<div class="card">
+
+<h2>Sensor 資料庫</h2>
+
+<div class="grid">
+
+<div class="input-group">
+<label>感測器尺寸</label>
+<select id="sensorPreset">
+<option value="0">1/3"</option>
+<option value="1">1/2"</option>
+<option value="2">1/1.8"</option>
+<option value="3">2/3" (5MP標配)</option>
+<option value="4">1"</option>
+<option value="5">1.1" (12MP標配)</option>
+<option value="6">4/3" (1.33")</option>
+<option value="7">APS-C</option>
+<option value="8">35mm Full Frame</option>
+</select>
+</div>
+
+<div class="input-group">
+<label>對角線長度</label>
+<input id="sensorDiagonal" readonly>
+</div>
+
+<div class="input-group">
+<label>長 × 寬</label>
+<input id="sensorSize" readonly>
+</div>
+
+<div class="input-group">
+<label>建議鏡頭成像圈</label>
+<input id="sensorCircle" readonly>
+</div>
+
+</div>
+
+<div class="result" id="sensorResult"></div>
+
+</div>
+
+<div class="card">
+
+<h2>FOV / WD / 焦距</h2>
+
+<div class="grid">
+
+<div class="input-group">
+<label>WD</label>
+<input type="number" id="wd" value="300">
+</div>
+
+<div class="input-group">
+<label>WD 單位</label>
+<select id="wdUnit">
+<option value="mm" selected>mm</option>
+<option value="um">um</option>
+</select>
+</div>
+
+<div class="input-group">
+<label>焦距</label>
+<input type="number" id="focal" value="16">
+</div>
+
+<div class="input-group">
+<label>焦距單位</label>
+<select id="focalUnit">
+<option value="mm" selected>mm</option>
+<option value="um">um</option>
+</select>
+</div>
+
+</div>
+
+<div class="result" id="fovResult"></div>
+
+</div>
+
+<div class="card">
+
+<h2>解析度 / Line Rate</h2>
+
+<div class="grid">
+
+<div class="input-group">
+<label>FOV</label>
+<input type="number" id="fovWidth" value="120">
+</div>
+
+<div class="input-group">
+<label>FOV 單位</label>
+<select id="fovUnit">
+<option value="mm" selected>mm</option>
+<option value="um">um</option>
+</select>
+</div>
+
+<div class="input-group">
+<label>畫質</label>
+<select id="resolution">
+<option value="1024">1024 (1280×720)</option>
+<option value="2048">2048 (1920×1080)</option>
+<option value="4096" selected>4096 (3840×2160)</option>
+<option value="8192">8192 (7680×4320)</option>
+<option value="16384">16K (15360×8640)</option>
+<option value="32768">32K (30720×17280)</option>
+</select>
+</div>
+
+<div class="input-group">
+<label>速度 mm/s</label>
+<input type="number" id="speed" value="500">
+</div>
+
+</div>
+
+<div class="result" id="precisionResult"></div>
+
+</div>
+
+<div class="card">
+
+<h2>最大曝光極限</h2>
+
+<div class="grid">
+
+<div class="input-group">
+<label>掃描頻率 Hz</label>
+<input type="number" id="scanRate" value="10000">
+</div>
+
+</div>
+
+<div class="result" id="exposureResult"></div>
+
+</div>
+
+
+<div class="card">
+
+<h2>DOF 景深計算</h2>
+
+<div class="grid">
+
+<div class="input-group">
+<label>F值</label>
+<input type="number" id="fNumber" value="8">
+</div>
+
+<div class="input-group">
+<label>CoC (um)</label>
+<input type="number" id="coc" value="3.45">
+</div>
+
+<div class="input-group">
+<label>倍率 Beta</label>
+<input type="number" id="beta" value="0.2">
+</div>
+
+</div>
+
+<div class="result" id="dofResult"></div>
+
+</div>
+
+</div>
+
+<div id="encoder" class="tab">
+
+<div class="card">
+
+<h2>Encoder 計算</h2>
+
+<div class="grid">
+
+<div class="input-group">
+<label>膠輪圓周長</label>
+<input type="number" id="circumference" value="200">
+</div>
+
+<div class="input-group">
+<label>單位</label>
+<select id="circUnit">
+<option value="mm" selected>mm</option>
+<option value="um">um</option>
+</select>
+</div>
+
+<div class="input-group">
+<label>Pulse 數</label>
+<input type="number" id="pulse" value="2000">
+</div>
+
+</div>
+
+<div class="result" id="encoderResult"></div>
+
+</div>
+
+<div class="card">
+
+<h2>最佳同步線速度</h2>
+
+<div class="grid">
+
+<div class="input-group">
+<label>Pixel Size</label>
+<input type="number" id="pixelSize" value="3.45">
+</div>
+
+<div class="input-group">
+<label>單位</label>
+<select id="pixelUnit">
+<option value="um" selected>um</option>
+<option value="mm">mm</option>
+</select>
+</div>
+
+<div class="input-group">
+<label>鏡頭倍率</label>
+<input type="number" id="magnification" value="0.2">
+</div>
+
+<div class="input-group">
+<label>Line Rate Hz</label>
+<input type="number" id="lineRate" value="32000">
+</div>
+
+</div>
+
+<div class="result" id="syncResult"></div>
+
+<button class="copy-btn tab-btn" onclick="copyAll()">一鍵複製所有結果</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+const sensorDB = [
+{name:'1/3"',width:4.8},
+{name:'1/2"',width:6.4},
+{name:'1/1.8"',width:7.2},
+{name:'2/3"',width:8.8},
+{name:'1"',width:12.8},
+{name:'1.1"',width:14.1},
+{name:'4/3"',width:18},
+{name:'APS-C',width:23.5},
+{name:'FF',width:36}
+];
+
+function showTab(id){
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+}
+
+function toMM(v,u){
+v=parseFloat(v)||0;
+if(u==='um') return v/1000;
+if(u==='cm') return v*10;
+if(u==='m') return v*1000;
+return v;
+}
+
+function eng(mm){
+if(mm>=1000) return (mm/1000).toFixed(4)+' m';
+if(mm<1) return (mm*1000).toFixed(2)+' um';
+return mm.toFixed(4)+' mm';
+}
+
+function updateBasic(){
+const mm = toMM(lengthValue.value,lengthUnit.value);
+const hz = parseFloat(hzValue.value)||0;
+const sec = hz>0 ? 1/hz : 0;
+
+basicResult.innerHTML=`
+Length = ${eng(mm)}<br>
+Hz週期 = ${sec.toFixed(8)} 秒
+`;
+}
+
+function updateSensor(){
+const s=sensorDB[sensorPreset.value];
+sensorResult.innerHTML=`
+Sensor Width = ${s.width} mm
+`;
+calcFOV();
+}
+
+function calcFOV(){
+const sensor=sensorDB[sensorPreset.value].width;
+const wdv=toMM(wd.value,wdUnit.value);
+const focalv=toMM(focal.value,focalUnit.value);
+
+const beta=focalv/wdv;
+const fov=sensor/beta;
+const focalCalc=wdv*beta;
+
+fovResult.innerHTML=`
+<b>公式</b><br>
+焦距 = WD × 倍率(Beta)<br>
+視野FOV = Sensor長度 / 倍率(Beta)<br><br>
+
+倍率 Beta = ${beta.toFixed(4)}<br>
+FOV = ${eng(fov)}<br>
+焦距 = ${eng(focalCalc)}
+`;
+}
+
+function calcPrecision(){
+const fov=toMM(fovWidth.value,fovUnit.value);
+const pixels=parseFloat(resolution.value)||1;
+const speedv=parseFloat(speed.value)||0;
+
+const resolutionv=(fov/pixels)*1000;
+const hz=speedv/(resolutionv/1000);
+const reverseSpeed=hz*(resolutionv/1000);
+
+precisionResult.innerHTML=`
+<b>公式</b><br>
+頻率(Hz) = 輸送帶速度(mm/s) / 解析度(mm/pixel)<br><br>
+
+解析度 = ${resolutionv.toFixed(4)} um/pixel<br>
+頻率 = ${hz.toFixed(2)} Hz<br>
+反推速度 = ${reverseSpeed.toFixed(2)} mm/s
+`;
+}
+
+function calcExposure(){
+const scan=parseFloat(scanRate.value)||1;
+const exposure=1/scan;
+
+exposureResult.innerHTML=`
+<b>公式</b><br>
+最大曝光時間(秒) = 1 / 掃描頻率(Hz)<br><br>
+
+曝光時間 = ${exposure.toFixed(8)} 秒<br>
+= ${(exposure*1000).toFixed(4)} ms
+`;
+}
+
+function calcEncoder(){
+const circ=toMM(circumference.value,circUnit.value);
+const pulsev=parseFloat(pulse.value)||1;
+
+const spacing=circ/pulsev;
+
+encoderResult.innerHTML=`
+<b>公式</b><br>
+Pulse間距 = 圓周長 / Pulse數<br><br>
+
+Pulse間距 = ${eng(spacing)}
+`;
+}
+
+function calcSync(){
+let pixel=parseFloat(pixelSize.value)||0;
+
+if(pixelUnit.value==='mm') pixel*=1000;
+
+const mag=parseFloat(magnification.value)||1;
+const lr=parseFloat(lineRate.value)||1;
+
+const objectRes=pixel/mag;
+const speed=objectRes*lr/1000;
+const reverseHz=speed/(objectRes/1000);
+
+syncResult.innerHTML=`
+<b>公式</b><br>
+頻率(Hz) = 輸送帶速度(mm/s) / 解析度(mm/pixel)<br><br>
+
+物方解析度 = ${objectRes.toFixed(4)} um/pixel<br>
+同步速度 = ${speed.toFixed(3)} mm/s<br>
+反推頻率 = ${reverseHz.toFixed(2)} Hz
+`;
+}
+
+function calcDOF(){
+const f=parseFloat(fNumber.value)||0;
+const cocv=parseFloat(coc.value)||0;
+const b=parseFloat(beta.value)||0;
+
+const dof=(2*f*cocv*(1+b))/(b*b);
+
+dofResult.innerHTML=`
+<b>公式</b><br>
+DOF = 2 × F值 × CoC × (1 + Beta) / Beta²<br><br>
+
+DOF = ${dof.toFixed(2)} um<br>
+= ${(dof/1000).toFixed(4)} mm
+`;
+}
+
+function updateAll(){
+updateBasic();
+updateSensor();
+calcPrecision();
+calcExposure();
+calcEncoder();
+calcSync();
+calcDOF();
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+document.querySelectorAll('input,select').forEach(el=>{
+el.addEventListener('input',updateAll);
+el.addEventListener('change',updateAll);
+});
+updateAll();
+});
+
+</script>
+
+
+</body>
+</html>
