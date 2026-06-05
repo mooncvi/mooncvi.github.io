@@ -1112,7 +1112,7 @@ my-optical-calculator/
         svg.innerHTML = html;
     }
 
-    // --- TAB 5: PWA 導出控制 ---
+   // --- TAB 5: PWA 導出控制 ---
     function downloadPWAFile(type) {
         let name = type === 'manifest' ? "manifest.json" : "service-worker.js";
         let text = "";
@@ -1120,17 +1120,30 @@ my-optical-calculator/
             text = `{
   "name": "Machine Vision Optical Calculator",
   "short_name": "光學計算機",
-  "start_url": "./光學計算機_V5_Professional.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1a1d24",
   "theme-color": "#4b9cd3",
   "icons": []
 }`;
         } else {
-            text = `const CACHE_NAME = 'optics-v5-cache';
+            text = `const CACHE_NAME = 'optics-v5-cache-v1';
+const ASSETS = ['./', './index.html', './manifest.json'];
+
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./光學計算機_V5_Professional.html', './manifest.json'])));
+  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
+  self.skipWaiting();
 });
+
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys => Promise.all(
+      keys.map(k => { if(k !== CACHE_NAME) return caches.delete(k); })
+    ))
+  );
+  return self.clients.claim();
+});
+
 self.addEventListener('fetch', e => {
   e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
 });`;
@@ -1141,19 +1154,6 @@ self.addEventListener('fetch', e => {
         link.download = name;
         link.click();
     }
-
-    // --- 生命週期初始化 ---
-    document.addEventListener('DOMContentLoaded', () => {
-        updateInputLocking();
-        applySensorPreset();
-        calcEncoderModule();
-        solveBasic('hz');
-        solveLength();
-
-        setInterval(() => {
-            document.getElementById('live-clock').innerText = "系統時間: " + new Date().toLocaleString();
-        }, 1000);
-    });
 </script>
 </body>
 </html>
