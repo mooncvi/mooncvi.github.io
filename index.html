@@ -5,6 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>光學計算機_V5_Professional</title>
     <style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a1d24">
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js').then(reg => {
+                    // 監聽是否有新版本下載完成
+                    reg.addEventListener('updatefound', () => {
+                        const newWorker = reg.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // 發現新版本已就緒，自動重新整理網頁
+                                window.location.reload();
+                            }
+                        });
+                    });
+                });
+            });
+
+            // 當新 Service Worker 強制接管(claim)時，立刻觸發頁面更新
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    window.location.reload();
+                    refreshing = true;
+                }
+            });
+        }
+    </script>
+</head>
         :root {
             --bg-color: #1a1d24;
             --card-bg: #222630;
