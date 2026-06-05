@@ -1,7 +1,45 @@
-const CACHE_NAME = 'optics-v5-cache';
+// 💡 重要提示：以後只要網頁有修改，請把下面的 v1 改成 v2、v3... 瀏覽器就會立刻知道要更新！
+const CACHE_NAME = 'optics-v5-cache-v1'; 
+
+// 需要快取的靜態資源（已修正為您目前實際應用的 index.html 檔名）
+const ASSETS_TO_CACHE = [
+  './',
+  './index.html',
+  './manifest.json'
+];
+
+// 1. 安裝階段：強制跳過等待，立刻讓新版上工
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./光學計算機_V5_Professional.html', './manifest.json'])));
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
+  );
+  self.skipWaiting(); // 【關鍵】不要讓新版卡在 waiting 狀態
 });
+
+// 2. 啟用階段：自動比對並清除「非當前版本」的所有舊快取
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys => {
+      return Promise.all(
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            console.log('正在清理舊快取殘留:', key);
+            return caches.delete(key); // 【關鍵】刪除舊快取桶子
+          }
+        })
+      );
+    })
+  );
+  return self.clients.claim(); // 【關鍵】讓新版 Service Worker 立即接管當前網頁
+});
+
+// 3. 攔截請求：優先從快取抓取，沒有才走網路
 self.addEventListener('fetch', e => {
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+  e.respondWith(
+    caches.match(e.request).then(response => {
+      return response || fetch(e.request);
+    })
+  );
 });
