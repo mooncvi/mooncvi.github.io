@@ -1,4 +1,4 @@
-const CACHE_NAME = 'optics-v5-core-cache-v1';
+const CACHE_NAME = 'optics-v5-cache-v2';
 const ASSETS_TO_CACHE = [
   './光學計算機_V5_Professional.html',
   './manifest.json'
