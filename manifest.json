@@ -1,8 +1,8 @@
 {
   "name": "Machine Vision Optical Calculator V5 Professional",
-  "short_name": "光學計算機V5.5",
+  "short_name": "光學計算機V5",
   "description": "專業級機器視覺光學幾何與自動化硬體同步閉環推導工具",
-  "start_url": "./光學計算機_V5.5_Professional.html",
+  "start_url": "./光學計算機_V5_Professional.html",
   "display": "standalone",
   "background_color": "#1a1d24",
   "theme_color": "#4b9cd3",
