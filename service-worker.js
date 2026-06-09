@@ -1,5 +1,5 @@
 // 💡 重要提示：以後只要網頁有修改，請把下面的 v1 改成 v2、v3... 瀏覽器就會立刻知道要更新！
-const CACHE_NAME = 'optics-v8-cache-v5'; 
+const CACHE_NAME = 'optics-v5-cache-v3'; 
 
 // 需要快取的靜態資源（已修正為您目前實際應用的 index.html 檔名）
 const ASSETS_TO_CACHE = [
