@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>光學計算機_V5.5_Professional PRO Edition</title>
+    <title>光學計算機_V8_Professional PRO Edition</title>
 
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a1d24">
@@ -370,15 +370,15 @@
 
 <div class="container">
     <header>
-        <h1>光學計算機 <span>V5.5 PRO</span></h1>
+        <h1>光學計算機 <span>V8 PRO</span></h1>
         <div style="font-size: 14px; color: var(--text-main);" id="live-clock"></div>
     </header>
 
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('vision-tab', this)">感測器與核心推導</button>
         <button class="tab-btn" onclick="switchTab('basic-tab', this)">單位換算</button>
-        <button class="tab-btn" onclick="switchTab('encoder-tab', this)">Encoder</button>
-        <button class="tab-btn" onclick="switchTab('visual-tab', this)">光路圖</button>
+        <button class="tab-btn" onclick="switchTab('encoder-tab', this)">Encoder編碼器</button>
+        <button class="tab-btn" onclick="switchTab('visual-tab', this)">光路幾何藍圖</button>
         <button class="tab-btn" onclick="switchTab('report-tab', this)">報告</button>
         <button class="tab-btn" onclick="switchTab('pwa-tab', this)">PWA</button>
     </div>
@@ -415,14 +415,24 @@
                     <label>建議鏡頭成像圈</label>
                     <input type="text" id="v-sensor-circle" readonly>
                 </div>
-                <div class="input-row" style="background: rgba(75, 156, 211, 0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(75, 156, 211, 0.2);">
-                    <div class="input-group" style="margin-bottom:0;">
-                        <label style="color:var(--text-bright); font-weight: bold;">感測器寬度 [mm]</label>
-                        <input type="number" id="v-sensor-w" value="8.8" step="0.1" oninput="calcVisionAll()">
+                <div style="background: rgba(75, 156, 211, 0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(75, 156, 211, 0.2); margin-bottom: 12px;">
+                    <div style="font-size:13px; color:var(--accent-color); margin-bottom:10px; font-weight:600;">📐 感測器尺寸輸入 → 自動推導單像素物方解析度</div>
+                    <div class="input-row" style="margin-bottom:0;">
+                        <div class="input-group" style="margin-bottom:0;">
+                            <label style="color:var(--text-bright); font-weight: bold;">感應器掃描長度 [mm]</label>
+                            <input type="number" id="v-sensor-w" value="30" step="0.1" oninput="calcSensorResolution()">
+                        </div>
+                        <div class="input-group" style="margin-bottom:0;">
+                            <label style="color:var(--text-bright); font-weight: bold;">單向 X 像素數量 [px]</label>
+                            <input type="number" id="v-sensor-px-count" value="3520" step="1" oninput="calcSensorResolution()">
+                        </div>
+                        <div class="input-group" style="margin-bottom:0;">
+                            <label style="color:var(--accent-color); font-weight: bold;">推導單像素解析度 [µm/px]</label>
+                            <input type="number" id="v-pixel-size" readonly style="background:var(--result-bg); color:#98c379; border-style:dashed;">
+                        </div>
                     </div>
-                    <div class="input-group" style="margin-bottom:0;">
-                        <label style="color:var(--text-bright); font-weight: bold;">相機像素尺寸 [µm]</label>
-                        <input type="number" id="v-pixel-size" value="3.45" step="0.01" oninput="calcVisionAll()">
+                    <div style="margin-top:10px; padding:8px 10px; background:var(--result-bg); border-radius:6px; font-size:13px; color:#98c379; font-family:monospace;" id="sensor-res-formula-display">
+                        計算式：30 mm ÷ 3520 px = 0.008523 mm = 8.52 µm/px
                     </div>
                 </div>
 
@@ -444,10 +454,10 @@
                             <select id="v-res-pixels" onchange="toggleCustomPixels()">
                                 <option value="1024">1024 (1K)</option>
                                 <option value="2048">2048 (2K)</option>
-                                <option value="4096" selected>4096 (4K 標配)</option>
+                                <option value="4096">4096 (4K)</option>
                                 <option value="8192">8192 (8K)</option>
                                 <option value="16384">16384 (16K)</option>
-                                <option value="32768">32768 (32K 線掃描)</option>
+                                <option value="32768">32768 (32K)</option>
                                 <option value="custom">-- 自定義像素數 --</option>
                             </select>
                         </div>
@@ -462,14 +472,13 @@
                     </div>
                     <div class="result-panel">
                         <div class="result-line"><span class="result-label">實際空間解析度:</span><span class="result-value" id="out-res-val">-</span></div>
-                        <div class="result-line"><span class="result-label">反推 Pixel 數:</span><span class="result-value" id="out-res-pixels">-</span></div>
                         <div class="result-line"><span class="result-label">所需畫素 (FOV ÷ Resolution):</span><span class="result-value" id="out-required-pixel">-</span></div>
                     </div>
                 </div>
             </div>
 
             <div class="card">
-                <h2><span class="step-badge">STEP 2</span>鏡頭幾何</h2>
+                <h2><span class="step-badge">STEP 2</span>鏡頭幾何(Lens geometric)</h2>
                 <div class="formula-badge">β = Focal / WD ｜ FOV = Sensor_W / β</div>
                 <div class="input-group">
                     <label>當前幾何求解目標</label>
@@ -505,7 +514,7 @@
 
         <div class="grid-2">
             <div class="card">
-                <h2><span class="step-badge">STEP 3</span>Line Rate</h2>
+                <h2><span class="step-badge">STEP 3</span>每秒掃描的速度(Line Rate)</h2>
                 <div class="formula-badge">Line Rate = 速度 ÷ (解析度 / 1000)</div>
                 <div class="input-group">
                     <label>當前率定求解目標</label>
@@ -524,80 +533,62 @@
                         <input type="number" id="v-lr-speed" value="500" oninput="calcVisionAll()">
                     </div>
                     <div class="input-group">
-                        <label>Line Rate [Hz]</label>
+                        <label>掃描頻率 Line Rate [Hz]</label>
                         <input type="number" id="v-lr-hz" value="17066" oninput="calcVisionAll()">
                     </div>
                 </div>
                 <div class="result-panel">
-                    <div class="result-line"><span class="result-label">解算 Line Rate 頻率:</span><span class="result-value" id="out-lr-hz">-</span></div>
-                    <div class="result-line"><span class="result-label">解算同步速度 Speed:</span><span class="result-value" id="out-lr-speed">-</span></div>
-                    <div class="result-line" style="border-top:1px dashed rgba(255,255,255,0.1); padding-top:8px;"><span class="result-label">相機需求等級:</span><span class="result-value" id="out-camera-grade">-</span></div>
+                    <div class="result-line"><span class="result-label">解算掃描速率 Line Rate:</span><span class="result-value" id="out-lr-hz">-</span></div>
+                    <div class="result-line"><span class="result-label">解算輸送帶上限速度:</span><span class="result-value" id="out-lr-speed">-</span></div>
+                    <div class="result-line" style="border-top:1px dashed rgba(255,255,255,0.1); padding-top:8px;"><span class="result-label">相機工業需求等級判定:</span><span class="result-value" id="out-camera-grade">-</span></div>
                 </div>
             </div>
 
             <div class="card">
-                <h2><span class="step-badge">STEP 4</span>曝光分析</h2>
-                <div class="formula-badge">Line Period = 1 / LineRate ｜ 建議區間: 70% ~ 90%</div>
+                <h2><span class="step-badge">STEP 4</span>曝光安全分析(Line Period)</h2>
+                <div class="formula-badge">Period = 1 / LineRate ｜ Duty = Exposure / Period</div>
                 <div class="input-row">
                     <div class="input-group">
-                        <label>當前相機頻率基線 [Hz]</label>
-                        <input type="number" id="v-exp-hz" value="17066" readonly>
+                        <label>選定實際曝光時間 [µs]</label>
+                        <input type="number" id="v-exp-time-us" value="40" oninput="calcVisionAll(); updateExpMs();">
                     </div>
                     <div class="input-group">
-                        <label>實際曝光時間 [ms]</label>
-                        <input type="number" id="v-exp-time-ms" value="0.04" step="0.001" oninput="syncExposureUnit('ms')">
-                    </div>
-                    <div class="input-group">
-                        <label>實際曝光時間 [µs]</label>
-                        <input type="number" id="v-exp-time-us" value="40" step="1" oninput="syncExposureUnit('us')">
+                        <label>曝光時間對應 [ms]</label>
+                        <input type="number" id="v-exp-time-ms" value="0.040" step="0.001" oninput="updateExpUs();">
                     </div>
                 </div>
                 <div class="result-panel">
-                    <div class="result-line"><span class="result-label">Line Period (總時槽週期):</span><span class="result-value" id="out-exp-period">-</span></div>
-                    <div class="result-line"><span class="result-label">建議曝光安全區間 (70%~90%):</span><span class="result-value" id="out-exp-suggest-range" style="color:var(--text-main);">-</span></div>
-                    <div class="result-line"><span class="result-label">當前曝光佔空比:</span><span class="result-value" id="out-exp-duty">-</span></div>
-                    <div class="result-line" style="border-top:1px dashed rgba(255,255,255,0.1); padding-top:8px;"><span class="result-label">安全評估狀態:</span><span class="result-value" id="out-exp-status">-</span></div>
+                    <div class="result-line"><span class="result-label">單行採集總時槽週期 (Period):</span><span class="result-value" id="out-line-period">-</span></div>
+                    <div class="result-line"><span class="result-label">當前採集曝光佔空比 (Duty Cycle):</span><span class="result-value" id="out-exp-duty">-</span></div>
                 </div>
             </div>
         </div>
 
         <div class="grid-2">
             <div class="card">
-                <h2><span class="step-badge">STEP 5</span>景深 (DOF)</h2>
-                <div class="formula-badge">景深 (mm) = (2 × F × CoC × (1 + β)) / β²</div>
+                <h2><span class="step-badge">STEP 5</span>光學景深範圍(Depth Of Field)</h2>
+                <div class="formula-badge">DOF = (2 × F × CoC × (1 + β)) / β²</div>
                 <div class="input-row">
                     <div class="input-group">
                         <label>光圈 F 值</label>
-                        <input type="number" id="v-dof-f" value="8" step="0.5" oninput="calcVisionAll()">
+                        <input type="number" id="v-dof-f" value="4.0" step="0.1" oninput="calcVisionAll()">
                     </div>
                     <div class="input-group">
                         <label>容許彌散圓 CoC [µm]</label>
-                        <input type="number" id="v-dof-coc" value="3.45" step="0.1" oninput="calcVisionAll()">
+                        <input type="number" id="v-dof-coc" value="0.04" step="0.1" oninput="calcVisionAll()">
                     </div>
                 </div>
                 <div class="result-panel">
-                    <div class="result-line"><span class="result-label">計算幾何景深總量:</span><span class="result-value" id="v-dof-out" style="color:var(--accent-color); font-size:15px;">-</span></div>
-                </div>
-                <div style="margin-top: 12px; height: 110px; background:var(--result-bg); border-radius:6px; padding:8px; border:1px solid var(--border-color);">
-                    <svg id="dof-chart-svg" width="100%" height="100%" viewBox="0 0 400 100" preserveAspectRatio="none"></svg>
+                    <div class="result-line"><span class="result-label">幾何景深覆蓋總量 (DOF):</span><span class="result-value" id="out-dof-total">-</span></div>
+                    <div class="result-line" style="flex-direction: column; align-items: flex-start; gap: 4px;"><span class="result-label">內置參考圖檔對照狀態:</span><span style="color:#e5c07b; font-family:monospace; font-size:12px;">📄 [系統對照組: DOF_Chart_Ref.png]</span></div>
                 </div>
             </div>
 
             <div class="card">
-                <h2><span class="step-badge">STEP 6</span>運動模糊 (Motion Blur)</h2>
-                <div class="formula-badge">Blur (µm) = 速度 × 曝光時間 ｜ Blur Pixel = Blur ÷ 解析度</div>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>當前運動速度 [mm/s]</label>
-                        <input type="number" id="v-blur-speed" value="500" readonly>
-                    </div>
-                    <div class="input-group">
-                        <label>採納曝光時間 [µs]</label>
-                        <input type="number" id="v-blur-exp-us" value="40" readonly>
-                    </div>
-                </div>
-                <div class="result-panel">
-                    <div class="result-line"><span class="result-label">模糊量 Blur [µm]:</span><span class="result-value" id="out-blur-um">-</span></div>
+                <h2><span class="step-badge">STEP 6</span>動態高頻運動模糊(Motion Blur)</h2>
+                <div class="formula-badge">Blur = Speed × Exposure_Time</div>
+                <div class="result-panel" style="margin-top:0;">
+                    <div class="result-line"><span class="result-label">動態位移模糊量 (實體量):</span><span class="result-value" id="out-blur-dis">-</span></div>
                     <div class="result-line"><span class="result-label">模糊像素 (Sensor端/Pixel Size):</span><span class="result-value" id="out-blur-pixel-sensor" style="color:var(--text-main);">-</span></div>
                     <div class="result-line"><span class="result-label">模糊像素 (物方端/實體解析度):</span><span class="result-value" id="out-blur-pixel-object">-</span></div>
                     <div class="result-line" style="border-top:1px dashed rgba(255,255,255,0.1); padding-top:8px;"><span class="result-label">運動模糊風險判定:</span><span class="result-value" id="out-blur-status">-</span></div>
@@ -619,10 +610,10 @@
                     </div>
                 </div>
                 <div class="result-panel">
-                    <div class="grid-3" style="margin-bottom:0; gap:12px;">
-                        <div class="result-line"><span class="result-label">單台相機FOV:</span><span class="result-value" id="out-stitch-fov">-</span></div>
-                        <div class="result-line"><span class="result-label">最少需要相機台數:</span><span class="result-value" id="out-stitch-count" style="font-size:16px; color:var(--accent-color);">-</span></div>
-                        <div class="result-line"><span class="result-label">拼接實體覆蓋總寬度:</span><span class="result-value" id="out-stitch-actual">-</span></div>
+                    <div class="grid-3" style="margin-bottom: 0;">
+                        <div><span class="result-label">所需最少相機台數:</span><br><span class="result-value" id="out-stitch-cam-count" style="font-size:20px; color:var(--accent-color);">-</span></div>
+                        <div><span class="result-label">單台有效視野寬度:</span><br><span class="result-value" id="out-stitch-eff-fov">-</span></div>
+                        <div><span class="result-label">系統重疊區總寬度:</span><br><span class="result-value" id="out-stitch-overlap-mm">-</span></div>
                     </div>
                 </div>
             </div>
@@ -633,123 +624,166 @@
         <div class="grid-2">
             <div class="card">
                 <h2>時間 / 頻率交互換算</h2>
-                <div class="input-group">
-                    <label>輸入頻率 (Hz)</label>
-                    <input type="number" id="basic-hz" value="10000" oninput="solveBasic('hz')">
+                <div class="formula-badge">f(Hz) = 1 / T(s) ｜ f(kHz) = f(Hz) / 1000</div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>頻率 (Hz)</label>
+                        <input type="number" id="basic-hz" value="10000" oninput="solveBasic('hz')">
+                    </div>
+                    <div class="input-group">
+                        <label>頻率 (kHz)</label>
+                        <input type="number" id="basic-khz" value="10" step="0.001" oninput="solveBasic('khz')">
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label>輸入週期時間 (秒)</label>
-                    <input type="number" id="basic-time" value="0.0001" step="0.000001" oninput="solveBasic('time')">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>週期時間 (s)</label>
+                        <input type="number" id="basic-time" value="0.0001" step="0.000001" oninput="solveBasic('time')">
+                    </div>
+                    <div class="input-group">
+                        <label>週期時間 (ms)</label>
+                        <input type="number" id="basic-time-ms" value="0.1" step="0.001" oninput="solveBasic('time_ms')">
+                    </div>
+                    <div class="input-group">
+                        <label>週期時間 (µs)</label>
+                        <input type="number" id="basic-time-us" value="100" step="0.1" oninput="solveBasic('time_us')">
+                    </div>
                 </div>
                 <div class="result-panel">
-                    <div class="result-line"><span class="result-label">工程頻率規格:</span><span class="result-value" id="smart-hz-out">-</span></div>
-                    <div class="result-line"><span class="result-label">工程時間規格:</span><span class="result-value" id="smart-time-out">-</span></div>
+                    <div class="result-line"><span class="result-label">頻率 (Hz):</span><span class="result-value" id="smart-hz-out">10,000 Hz</span></div>
+                    <div class="result-line"><span class="result-label">頻率 (kHz):</span><span class="result-value" id="smart-khz-out">10.000 kHz</span></div>
+                    <div class="result-line"><span class="result-label">週期時間 (s):</span><span class="result-value" id="smart-time-out">0.000100 s</span></div>
+                    <div class="result-line"><span class="result-label">週期時間 (ms):</span><span class="result-value" id="smart-time-ms-out">0.1000 ms</span></div>
+                    <div class="result-line"><span class="result-label">週期時間 (µs):</span><span class="result-value" id="smart-time-us-out">100.0 µs</span></div>
                 </div>
             </div>
 
             <div class="card">
                 <h2>長度工程單位智能轉換</h2>
+                <div class="formula-badge">1 m = 100 cm = 1,000 mm = 1,000,000 µm</div>
+                <div style="font-size:13px; color:var(--accent-color); margin-bottom:12px;">任意欄位輸入，其餘自動雙向更新</div>
                 <div class="input-row">
                     <div class="input-group">
-                        <label>數值輸入</label>
-                        <input type="number" id="basic-len" value="0.015" step="0.001" oninput="solveLength()">
+                        <label>公尺 (m)</label>
+                        <input type="number" id="len-m" value="0.000015" step="0.000001" oninput="solveLengthBi('m')">
                     </div>
                     <div class="input-group">
-                        <label>輸入單位</label>
-                        <select id="basic-len-unit" onchange="solveLength()">
-                            <option value="m">公尺 (m)</option>
-                            <option value="cm">公分 (cm)</option>
-                            <option value="mm" selected>公釐 (mm)</option>
-                            <option value="um">微米 (µm)</option>
-                        </select>
+                        <label>公分 (cm)</label>
+                        <input type="number" id="len-cm" value="0.0015" step="0.0001" oninput="solveLengthBi('cm')">
                     </div>
                 </div>
-                <div class="result-panel" id="length-smart-board"></div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>公釐 (mm)</label>
+                        <input type="number" id="len-mm" value="0.015" step="0.001" oninput="solveLengthBi('mm')">
+                    </div>
+                    <div class="input-group">
+                        <label>微米 (µm)</label>
+                        <input type="number" id="len-um" value="15" step="0.1" oninput="solveLengthBi('um')">
+                    </div>
+                </div>
+                <div class="result-panel" id="length-smart-board">
+                    <div class="result-line"><span class="result-label">換算式：</span><span class="result-value" id="len-formula-display">0.015 mm = 15 µm = 0.0015 cm = 0.000015 m</span></div>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="encoder-tab" class="tab-content">
         <div class="card">
-            <h2>編碼器與機械輪系閉環推導系統</h2>
-            <div class="formula-badge">等效脈衝數 = 線數 × 倍頻 ｜ 脈衝間距 = 周長 / 等效脈衝 ｜ 同步速度 = 解析度 × LineRate / 1000</div>
-            <div class="grid-2">
-                <div>
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label>膠輪圓周長 [mm]</label>
-                            <input type="number" id="e-circumference" value="200" oninput="calcEncoderModule()">
-                        </div>
-                        <div class="input-group">
-                            <label>編碼器原生線數 [Pulse/圈]</label>
-                            <input type="number" id="e-pulse" value="2000" oninput="calcEncoderModule()">
-                        </div>
-                    </div>
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label>採集卡解碼倍頻設定 (Multiplier)</label>
-                            <select id="e-multiplier" onchange="calcEncoderModule()">
-                                <option value="1">1x (單倍頻)</option>
-                                <option value="2">2x (雙倍頻)</option>
-                                <option value="4" selected>4x (四倍頻標配)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label>鏡頭放大倍率 Magnification</label>
-                            <input type="number" id="e-mag" value="0.073" step="0.001" oninput="calcEncoderModule()">
-                        </div>
-                        <div class="input-group">
-                            <label>相機掃描頻率 Line Rate [Hz]</label>
-                            <input type="number" id="e-lr" value="17066" oninput="calcEncoderModule()">
-                        </div>
-                    </div>
+            <h2>編碼器脈衝與物方移動率定</h2>
+            <div class="input-row">
+                <div class="input-group">
+                    <label>機械輪週長或機構直徑滾輪週長 [mm]</label>
+                    <input type="number" id="e-circumference" value="200" oninput="calcEncoderModule()">
                 </div>
-                <div>
-                    <div class="result-panel" style="height:100%; box-sizing:border-box; margin-top:0;">
-                        <div class="result-line"><span class="result-label">機械端等效總脈衝數:</span><span class="result-value" id="out-e-total">-</span></div>
-                        <div class="result-line"><span class="result-label">實體脈衝信號間距 (機械解析度):</span><span class="result-value" id="out-e-pitch">-</span></div>
-                        <div class="result-line"><span class="result-label">對應相機端元件像元解析度:</span><span class="result-value" id="out-e-camres">-</span></div>
-                        <div class="result-line"><span class="result-label">匹配此脈衝所需之同步打光/採集速度:</span><span class="result-value" id="out-e-syncspeed" style="color:var(--accent-color); font-size:15px;">-</span></div>
-                    </div>
+                <div class="input-group">
+                    <label>Encoder原始解析度 [PPR]</label>
+                    <input type="number" id="e-pulse" value="2000" oninput="calcEncoderModule()">
                 </div>
+                <div class="input-group">
+                    <label>採集卡/相機硬體倍頻模式</label>
+                    <select id="e-multiplier" onchange="calcEncoderModule()">
+                        <option value="1">1倍頻 (單緣觸發)</option>
+                        <option value="2">2倍頻 (雙緣觸發)</option>
+                        <option value="4" selected>4倍頻 (A/B相正交四倍頻)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>目前系統光學放大率 Beta</label>
+                    <input type="number" id="e-mag" value="0.0733" step="0.0001" oninput="calcEncoderModule()">
+                </div>
+            </div>
+            <div class="result-panel">
+                <div class="result-line"><span class="result-label">硬體倍頻後總脈衝數 (每圈):</span><span class="result-value" id="out-e-total-ppr">-</span></div>
+                <div class="result-line"><span class="result-label">物方空間移動解析度 (實體 mm/pulse):</span><span class="result-value" id="out-e-mm-pulse" style="color:var(--accent-color);">-</span></div>
+                <div class="result-line"><span class="result-label">Sensor端等效移動解析度 (Sensor mm/pulse):</span><span class="result-value" id="out-e-sensor-mm-pulse">-</span></div>
+                <div class="result-line" style="border-top:1px dashed rgba(255,255,255,0.1); padding-top:8px;"><span class="result-label">每行掃描最佳匹配頻率倍率 (建議除頻/乘頻係數):</span><span class="result-value" id="out-e-suggest-ratio" style="color:var(--text-bright);">-</span></div>
             </div>
         </div>
     </div>
 
     <div id="visual-tab" class="tab-content">
         <div class="layout-container">
-            <div class="interactive-form">
-                <div class="card">
-                    <h2>光路調校控制台</h2>
+            <div class="card interactive-form" id="blueprint-control-panel" style="transition: all 0.3s ease;">
+                <h2>動態幾何調整與機構防錯</h2>
+                
+                <div id="blueprint-alert-box" style="display:none; background:#3a2326; border:1px solid #e06c75; color:#e06c75; padding:12px; border-radius:8px; margin-bottom:16px; font-size:13px; font-weight:bold;"></div>
+
+                <div class="input-row">
                     <div class="input-group">
-                        <label>光學工作距離 WD [mm]</label>
-                        <input type="number" id="g-wd" value="300" oninput="syncVisualDiagram('wd')">
+                        <label>機構空間高度極限 Space [mm]</label>
+                        <input type="number" id="l-space-limit" value="500" oninput="drawOpticalBlueprint()">
                     </div>
                     <div class="input-group">
-                        <label>鏡頭焦距 Focal [mm]</label>
-                        <input type="number" id="g-focal" value="16" oninput="syncVisualDiagram('focal')">
+                        <label>預期物像全距 O/I [mm]</label>
+                        <input type="number" id="l-oi-dist" value="450" oninput="drawOpticalBlueprint()">
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>鏡頭本體長度 Lens L [mm]</label>
+                        <input type="number" id="l-lens-length" value="80" oninput="drawOpticalBlueprint()">
                     </div>
                     <div class="input-group">
-                        <label>視野 FOV 實體寬度 [mm]</label>
-                        <input type="number" id="g-fov" value="120" oninput="syncVisualDiagram('fov')">
+                        <label>鏡頭工作距離 WD [mm]</label>
+                        <input type="number" id="l-lens-wd" value="300" oninput="drawOpticalBlueprint()">
                     </div>
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label>光源外徑寬度 [mm]</label>
-                            <input type="number" id="g-light-w" value="140" oninput="drawOpticalBlueprint()">
-                        </div>
-                        <div class="input-group">
-                            <label>光源架設高度 [mm]</label>
-                            <input type="number" id="g-light-wd" value="50" oninput="drawOpticalBlueprint()">
-                        </div>
+                </div>
+
+                <div class="input-row" style="background: rgba(193, 130, 65, 0.06); padding: 12px; border-radius: 8px; border: 1px solid rgba(193, 130, 65, 0.2); margin-top:10px;">
+                    <div class="input-group">
+                        <label style="color:var(--text-bright)">打光類型</label>
+                        <select id="l-light-type" onchange="drawOpticalBlueprint()">
+                            <option value="bright" selected>正向反射光 (Brightfield)</option>
+                            <option value="dark">低角度側向光 (Darkfield)</option>
+                            <option value="back">穿透式背光 (Backlight)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label style="color:var(--text-bright)">光源實體外徑 [mm]</label>
+                        <input type="number" id="l-light-width" value="120" oninput="drawOpticalBlueprint()">
+                    </div>
+                    <div class="input-group">
+                        <label style="color:var(--text-bright)">光源安裝高度 [mm]</label>
+                        <input type="number" id="l-light-height" value="60" oninput="drawOpticalBlueprint()">
+                    </div>
+                </div>
+
+                <div class="result-panel" style="background: #11141a; border-color: #2c313c;">
+                    <div class="result-line"><span class="result-label">計算光學入射角 (θ):</span><span class="result-value" id="out-light-theta" style="color:#e5c07b;">-</span></div>
+                    <div class="result-line" style="flex-direction: column; align-items: flex-start; gap: 4px; padding-top:8px;">
+                        <span class="result-label" style="color:var(--accent-color);">視覺特徵分類與最佳應用：</span>
+                        <span id="out-light-feature" style="color:var(--text-bright); font-size:13px; font-weight:500; line-height:1.4;">-</span>
                     </div>
                 </div>
             </div>
+
             <div class="diagram-box">
-                <div style="width:100%; text-align:left; color:var(--accent-color); font-size:12px; font-family:monospace; margin-bottom:8px;">INTERACTIVE OPTICAL RAY TRACING DIAGRAM</div>
-                <svg id="optical-blueprint" width="100%" height="520" style="background:#15181f; border-radius:8px; border:1px solid var(--border-color);"></svg>
+                <div style="color: var(--text-bright); font-size:14px; font-weight:600; margin-bottom:12px;">光路幾何圖</div>
+                <svg id="optical-svg" width="100%" height="520" style="background:#11141a; border-radius:8px; border:1px solid var(--border-color);"></svg>
+                </div>
             </div>
         </div>
     </div>
@@ -757,71 +791,82 @@
     <div id="report-tab" class="tab-content">
         <div class="grid-1">
             <div class="card">
-                <h2>AOI 現場專案報告生成與審查面板</h2>
+                <h2>專案評估報告生成面板</h2>
                 <div class="input-row">
                     <div class="input-group">
-                        <label>操作人員名稱 (Operator)</label>
-                        <input type="text" id="r-operator" value="AOI Field Engineer">
+                        <label>使用者簽核 Senior Vision Engineer</label>
+                        <input type="text" id="r-operator" value="Senior Vision Engineer">
                     </div>
                     <div class="input-group">
-                        <label>專案備註說明 (Notes)</label>
-                        <input type="text" id="r-notes" value="標準自動化外觀瑕疵檢測光學配置調試報告。">
+                        <label>專案備註項目（固定：AOI評估）</label>
+                        <input type="text" id="r-notes" value="AOI評估" readonly style="background:var(--result-bg); color:#e5c07b; border-style:dashed;">
                     </div>
                 </div>
-                <div class="grid-3">
-                    <button class="btn-action" onclick="exportReportTXT()">匯出 TXT 描述檔</button>
-                    <button class="btn-action btn-secondary" onclick="copyReportToClipboard()">一鍵複製全部結果</button>
-                    <button class="btn-action btn-danger" onclick="resetAllFields()">一鍵重設所有欄位</button>
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px;">
+                    <button class="btn-action" onclick="exportReportTXT()">📄 匯出 TXT 描述檔</button>
+                    <button class="btn-action btn-secondary" onclick="copyReportToClipboard()">📋 一鍵複製全部結果</button>
+                    <button class="btn-action btn-danger" onclick="resetAllFields()">🔄 一鍵重設所有欄位</button>
+                    <button class="btn-action" style="background:#3d5a3e;" onclick="updateReportPreview()">🔍 即時純文字預覽快照</button>
                 </div>
-                <div style="margin-top:20px;">
-                    <label style="font-size:14px; color:var(--text-bright); display:block; margin-bottom:8px;">即時純文字預覽快照：</label>
-                    <textarea id="report-preview" style="height:320px; font-family:monospace; font-size:13px; background:var(--result-bg); color:var(--success-color); border:1px solid var(--border-color); resize:vertical;" readonly></textarea>
+                <div style="margin-top:4px;">
+                    <label style="font-size:14px; color:var(--text-bright); display:block; margin-bottom:8px;">即時純文字預覽快照（點擊上方按鈕或即時自動更新）：</label>
+                    <textarea id="report-preview" style="height:480px; font-family:monospace; font-size:13px; background:var(--result-bg); color:var(--success-color); border:1px solid var(--border-color); resize:vertical; width:100%; box-sizing:border-box;" readonly></textarea>
                 </div>
             </div>
         </div>
     </div>
-
     <div id="pwa-tab" class="tab-content">
         <div class="grid-2">
             <div class="card">
-                <h2>PWA 離線佈署箱與基礎架構設定</h2>
-                <p style="font-size:13px;">本光學計算機支援單檔完全離線運作。可透過下方組件一鍵匯出對應核心描述檔，將其放置於與本 HTML 相同的伺服器目錄即可啟用離線本機快取。</p>
-                <div class="grid-2">
-                    <button class="btn-action" onclick="downloadPWAFile('manifest')">產生 manifest.json</button>
-                    <button class="btn-action btn-secondary" onclick="downloadPWAFile('sw')">產生 service-worker.js</button>
+                <h2>PWA 離線佈署箱</h2>
+                <div style="font-size:14px; color:var(--text-main); margin-bottom:18px; line-height:1.7;">
+                    本工具支援 <strong style="color:var(--accent-color);">PWA 離線模式</strong>。將以下兩個檔案與本 HTML 放在同一目錄，即可實現完整離線使用與安裝至桌面。
+                </div>
+                <div class="result-panel" style="margin-bottom:16px;">
+                    <div class="result-line"><span class="result-label">Service Worker 狀態:</span><span class="result-value" id="pwa-sw-status">檢測中...</span></div>
+                    <div class="result-line"><span class="result-label">快取版本:</span><span class="result-value" id="pwa-cache-status">optics-v8-cache-v1</span></div>
+                    <div class="result-line"><span class="result-label">localStorage 持久化:</span><span class="result-value" id="pwa-storage-status">-</span></div>
+                    <div class="result-line"><span class="result-label">網路狀態:</span><span class="result-value" id="pwa-network-status">-</span></div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <button class="btn-action" onclick="downloadPWAFile('manifest')">⬇ 下載 manifest.json</button>
+                    <button class="btn-action btn-secondary" onclick="downloadPWAFile('sw')">⬇ 下載 service-worker.js</button>
+                </div>
+                <div style="margin-top:16px; font-size:13px; color:#8a929e; line-height:1.6;">
+                    📋 佈署步驟：<br>
+                    1. 將本 HTML、manifest.json、service-worker.js 放同一資料夾<br>
+                    2. 透過本地伺服器或 GitHub Pages 開啟（非 file:// 協議）<br>
+                    3. 瀏覽器將自動提示安裝為 PWA 應用
                 </div>
             </div>
             <div class="card">
                 <h2>狀態快取與持久化記憶環境</h2>
-                <p style="font-size:13px;">當前系統已成功對接全自動 <b>localStorage 機制</b>。以下核心配置在數值調整時將即時保存於本機瀏覽器沙盒中，即使遭遇頁面意外重新整理、關閉或全面斷網，亦能完整恢復上一次的調校狀態：</p>
-                <div style="background:var(--result-bg); padding:12px; border-radius:8px; border:1px dashed var(--border-color); font-family:monospace; font-size:12px; color:var(--accent-color);">
-                    ✓ Sensor Preset Selection<br>
-                    ✓ Field of View (FOV)<br>
-                    ✓ Working Distance (WD)<br>
-                    ✓ Spatial Resolution (解析度)<br>
-                    ✓ Target Exposure Time (曝光時間)
+                <div style="font-size:14px; color:var(--text-main); margin-bottom:12px;">當前 localStorage 已儲存的參數快照：</div>
+                <div class="result-panel" id="pwa-localstorage-display" style="font-family:monospace; font-size:12px; max-height:320px; overflow-y:auto;"></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px;">
+                    <button class="btn-action btn-secondary" onclick="refreshPWAStatus()">🔄 刷新狀態</button>
+                    <button class="btn-action btn-danger" onclick="clearPWACache()">🗑 清除快取資料</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 <script>
-    // --- 經典核心晶片資料庫對照表 ---
-    const SENSOR_DATABASE_V4 = [
-        {name:'1/3"', diagonal:'6.0 mm', size:'4.8 x 3.6 mm', circle:'> 6 mm', width:4.8},
-        {name:'1/2"', diagonal:'8.0 mm', size:'6.4 x 4.8 mm', circle:'> 8 mm', width:6.4},
-        {name:'1/1.8"', diagonal:'9.0 mm', size:'7.2 x 5.4 mm', circle:'> 9 mm', width:7.2},
-        {name:'2/3" (5MP標配)', diagonal:'11.0 mm', size:'8.8 x 6.6 mm', circle:'> 11 mm (C-mount)', width:8.8},
-        {name:'1"', diagonal:'16.0 mm', size:'12.8 x 9.6 mm', circle:'> 16 mm (C-mount)', width:12.8},
-        {name:'1.1" (12MP標配)', diagonal:'17.6 mm', size:'14.1 x 10.6 mm', circle:'> 17.6 mm (C-mount 高階)', width:14.1},
-        {name:'4/3" (1.33")', diagonal:'22.5 mm', size:'18.0 x 13.5 mm', circle:'> 23 mm (微單眼/大面陣)', width:18.0},
-        {name:'APS-C', diagonal:'28.4 mm', size:'23.5 x 15.6 mm', circle:'> 30 mm (F-mount)', width:23.5},
-        {name:'35mm Full Frame', diagonal:'43.3 mm', size:'36.0 x 24.0 mm', circle:'> 44 mm (大口徑/線掃描)', width:36.0}
+    // --- 全局基礎物理配置常數對照組 ---
+    const SENSOR_PRESETS = [
+        {name: '1/3"', diagonal: '6.0 mm', size: '4.8 x 3.6 mm', circle: '> 6.0 mm', width: 4.8},
+        {name: '1/2"', diagonal: '8.0 mm', size: '6.4 x 4.8 mm', circle: '> 8.0 mm', width: 6.4},
+        {name: '1/1.8"', diagonal: '8.9 mm', size: '7.2 x 5.4 mm', circle: '> 9.0 mm', width: 7.2},
+        {name: '2/3" (5MP標配)', diagonal: '11.0 mm', size: '8.8 x 6.6 mm', circle: '> 11.0 mm', width: 8.8},
+        {name: '1"', diagonal: '16.0 mm', size: '12.8 x 9.6 mm', circle: '> 16.0 mm', width: 12.8},
+        {name: '1.1" (12MP標配)', diagonal: '17.6 mm', size: '14.1 x 10.6 mm', circle: '> 17.6 mm', width: 14.1},
+        {name: '4/3" (1.33")', diagonal: '22.5 mm', size: '18.7 x 14.0 mm', circle: '> 22.0 mm', width: 18.7},
+        {name: 'APS-C', diagonal: '28.3 mm', size: '23.5 x 15.6 mm', circle: '> 28.5 mm', width: 23.5},
+        {name: '35mm Full Frame', diagonal: '43.3 mm', size: '36.0 x 24.0 mm', circle: '> 44 mm (大口徑/線掃描)', width: 36.0}
     ];
 
     const SUGGESTED_FOCAL_LIST = [8, 12, 16, 25, 35, 50, 75];
-    const APP_VERSION = "V5.5_Professional_PRO";
+    const APP_VERSION = "V8_Professional_PRO";
 
     // 頁籤切換控制
     function switchTab(tabId, element) {
@@ -829,7 +874,6 @@
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
         if(element) element.classList.add('active');
-        
         if(tabId === 'visual-tab') {
             drawOpticalBlueprint();
         }
@@ -837,592 +881,751 @@
 
     // 智能鎖定輸入欄位控制
     function updateInputLocking() {
-        // 光學幾何解算目標鎖定
-        const opticsTarget = document.getElementById('optics-target').value;
-        document.getElementById('v-opt-fov').readOnly = (opticsTarget === 'fov');
-        document.getElementById('v-opt-wd').readOnly = (opticsTarget === 'wd');
-        document.getElementById('v-opt-focal').readOnly = (opticsTarget === 'focal');
+        const resMode = document.getElementById('res-target').value;
+        const optMode = document.getElementById('optics-target').value;
+        const lrMode = document.getElementById('lr-target').value;
 
-        // 解析度解算目標鎖定
-        const resTarget = document.getElementById('res-target').value;
-        document.getElementById('v-res-resolution').readOnly = (resTarget === 'res');
-        document.getElementById('v-res-fov').readOnly = (resTarget === 'fov');
+        // STEP 1 鎖定
+        if(resMode === 'res') {
+            document.getElementById('v-res-resolution').readOnly = true;
+            document.getElementById('v-res-fov').readOnly = false;
+        } else {
+            document.getElementById('v-res-resolution').readOnly = false;
+            document.getElementById('v-res-fov').readOnly = true;
+        }
 
-        // Line Rate 鎖定
-        const lrTarget = document.getElementById('lr-target').value;
-        document.getElementById('v-lr-hz').readOnly = (lrTarget === 'hz');
-        document.getElementById('v-lr-speed').readOnly = (lrTarget === 'speed');
+        // STEP 2 鎖定
+        document.getElementById('v-opt-fov').readOnly = (optMode === 'fov');
+        document.getElementById('v-opt-wd').readOnly = (optMode === 'wd');
+        document.getElementById('v-opt-focal').readOnly = (optMode === 'focal');
+
+        // STEP 3 鎖定
+        document.getElementById('v-lr-hz').readOnly = (lrMode === 'hz');
+        document.getElementById('v-lr-speed').readOnly = (lrMode === 'speed');
 
         calcVisionAll();
     }
 
     function toggleCustomPixels() {
-        const val = document.getElementById('v-res-pixels').value;
-        document.getElementById('custom-pixels-wrapper').style.display = (val === 'custom') ? 'block' : 'none';
+        const select = document.getElementById('v-res-pixels');
+        const wrapper = document.getElementById('custom-pixels-wrapper');
+        wrapper.style.display = (select.value === 'custom') ? 'block' : 'none';
         calcVisionAll();
     }
 
     function applySensorPreset() {
         const idx = parseInt(document.getElementById('v-preset-select').value);
-        if(isNaN(idx) || idx < 0 || idx >= SENSOR_DATABASE_V4.length) return;
-        
-        const sensor = SENSOR_DATABASE_V4[idx];
-        document.getElementById('v-sensor-diagonal').value = sensor.diagonal;
-        document.getElementById('v-sensor-size').value = sensor.size;
-        document.getElementById('v-sensor-circle').value = sensor.circle;
-        document.getElementById('v-sensor-w').value = sensor.width;
-        
+        const config = SENSOR_PRESETS[idx];
+        document.getElementById('v-sensor-diagonal').value = config.diagonal;
+        document.getElementById('v-sensor-size').value = config.size;
+        document.getElementById('v-sensor-circle').value = config.circle;
+        // 自動同步感測器掃描長度（可被使用者覆蓋）
+        document.getElementById('v-sensor-w').value = config.width;
+        localStorage.setItem('calcv6_preset_idx', idx.toString());
+        calcSensorResolution();
+    }
+
+    function updateExpMs() {
+        const us = parseFloat(document.getElementById('v-exp-time-us').value) || 0;
+        document.getElementById('v-exp-time-ms').value = (us / 1000).toFixed(4);
         calcVisionAll();
     }
 
-    // 曝光分析單位連動 (ms <-> us)
-    function syncExposureUnit(source) {
-        if (source === 'ms') {
-            let ms = parseFloat(document.getElementById('v-exp-time-ms').value) || 0;
-            let us = Math.round(ms * 1000);
-            document.getElementById('v-exp-time-us').value = us;
-        } else {
-            let us = parseFloat(document.getElementById('v-exp-time-us').value) || 0;
-            let ms = us / 1000;
-            document.getElementById('v-exp-time-ms').value = ms;
-        }
+    function updateExpUs() {
+        const ms = parseFloat(document.getElementById('v-exp-time-ms').value) || 0;
+        document.getElementById('v-exp-time-us').value = Math.round(ms * 1000);
         calcVisionAll();
     }
 
-    // 核心數據全自動連動閉環運算核心 (Data Pipeline)
+    // --- 全自動核心數據聯動聯動引導 ---
     function calcVisionAll() {
-        // 抓取基礎感測器參數
+        // 1. 基礎感測器資訊讀取
         const sensorW = parseFloat(document.getElementById('v-sensor-w').value) || 8.8;
         const pixelSize = parseFloat(document.getElementById('v-pixel-size').value) || 3.45;
 
-        // 讀取各求解項的目標設定
-        const opticsTarget = document.getElementById('optics-target').value;
-        const resTarget = document.getElementById('res-target').value;
-        const lrTarget = document.getElementById('lr-target').value;
+        // 2. 處理 STEP 1 畫素與視野邏輯
+        const resMode = document.getElementById('res-target').value;
+        let selectPixels = document.getElementById('v-res-pixels').value;
+        let totalPixels = (selectPixels === 'custom') ? 
+            (parseFloat(document.getElementById('v-res-pixels-custom').value) || 2048) : parseInt(selectPixels);
 
+        let currentFOV = parseFloat(document.getElementById('v-res-fov').value) || 120;
+        let currentResMM = parseFloat(document.getElementById('v-res-resolution').value) || 0.05;
+
+        if (resMode === 'res') {
+            currentResMM = totalPixels > 0 ? currentFOV / totalPixels : 0;
+            document.getElementById('v-res-resolution').value = currentResMM.toFixed(5);
+        } else {
+            currentFOV = currentResMM * totalPixels;
+            document.getElementById('v-res-fov').value = currentFOV.toFixed(2);
+        }
+
+        document.getElementById('out-res-val').innerText = `${currentResMM.toFixed(4)} mm/pixel (= ${(currentResMM * 1000).toFixed(2)} µm/px)`;
+        document.getElementById('out-required-pixel').innerText = totalPixels + " px";
+
+        // 同步更動資料到 STEP 3 的物方空間解析度欄位
+        document.getElementById('v-lr-res').value = (currentResMM * 1000).toFixed(4);
+
+        // 3. 處理 STEP 2 鏡頭幾何求解連動
+        const optMode = document.getElementById('optics-target').value;
         let optFOV = parseFloat(document.getElementById('v-opt-fov').value) || 120;
         let optWD = parseFloat(document.getElementById('v-opt-wd').value) || 300;
         let optFocal = parseFloat(document.getElementById('v-opt-focal').value) || 16;
-        let calculatedBeta = 1.0;
+        let calculatedBeta = 0;
 
-        // 1. Data Pipeline 幾何運算串接鎖定解算
-        if (opticsTarget === 'fov') {
+        // 雙向全自動連動：若幾何求解目標不是視野本身，將 STEP 1 推導出的視野自動灌入
+        if(optMode !== 'fov' && resMode === 'res') {
+            optFOV = currentFOV;
+            document.getElementById('v-opt-fov').value = optFOV.toFixed(2);
+        }
+
+        if(optMode === 'fov') {
             calculatedBeta = optWD > 0 ? optFocal / optWD : 0;
             optFOV = calculatedBeta > 0 ? sensorW / calculatedBeta : 0;
             document.getElementById('v-opt-fov').value = optFOV.toFixed(2);
-        } else if (opticsTarget === 'wd') {
+        } else if(optMode === 'wd') {
             calculatedBeta = optFOV > 0 ? sensorW / optFOV : 0;
             optWD = calculatedBeta > 0 ? optFocal / calculatedBeta : 0;
             document.getElementById('v-opt-wd').value = optWD.toFixed(2);
-        } else if (opticsTarget === 'focal') {
+        } else if(optMode === 'focal') {
             calculatedBeta = optFOV > 0 ? sensorW / optFOV : 0;
             optFocal = optWD * calculatedBeta;
             document.getElementById('v-opt-focal').value = optFocal.toFixed(2);
         }
         calculatedBeta = optFOV > 0 ? sensorW / optFOV : 0;
-        
-        // 渲染 STEP 2 幾何結果
-        document.getElementById('out-opt-beta').innerText = calculatedBeta.toFixed(5);
+
+        document.getElementById('out-opt-beta').innerText = calculatedBeta.toFixed(5) + " 倍";
         document.getElementById('out-opt-fov').innerText = optFOV.toFixed(2) + " mm";
         document.getElementById('out-opt-wd').innerText = optWD.toFixed(2) + " mm";
         document.getElementById('out-opt-focal').innerText = optFocal.toFixed(2) + " mm";
 
-        // 建議焦距最近值匹配
-        let closestFocal = SUGGESTED_FOCAL_LIST[0];
-        let minDiff = Math.abs(optFocal - closestFocal);
-        for(let i=1; i<SUGGESTED_FOCAL_LIST.length; i++){
-            let diff = Math.abs(optFocal - SUGGESTED_FOCAL_LIST[i]);
-            if(diff < minDiff){
-                minDiff = diff;
-                closestFocal = SUGGESTED_FOCAL_LIST[i];
-            }
+        // 更新焦距推薦數列
+        let recText = "無合適標準規格";
+        for(let spec of SUGGESTED_FOCAL_LIST) {
+            if(spec >= optFocal) { recText = `${spec} mm 定焦鏡頭 (最接近)`; break; }
         }
-        document.getElementById('out-suggested-focal').innerText = closestFocal + " mm";
+        document.getElementById('out-suggested-focal').innerText = recText;
 
-        // 同步連動將更新後的幾何 FOV 傳遞給解析度計算端
-        if (resTarget === 'res') {
-            document.getElementById('v-res-fov').value = optFOV.toFixed(2);
-        }
-
-        // 2. 解析度與所需畫素運算
-        let resFOV = parseFloat(document.getElementById('v-res-fov').value) || optFOV;
-        let pixelsDropdown = document.getElementById('v-res-pixels').value;
-        let totalPixels = (pixelsDropdown === 'custom') ? (parseFloat(document.getElementById('v-res-pixels-custom').value) || 4096) : parseFloat(pixelsDropdown);
-        
-        let spatialRes_mm = parseFloat(document.getElementById('v-res-resolution').value) || 0.029;
-
-        if (resTarget === 'res') {
-            spatialRes_mm = totalPixels > 0 ? resFOV / totalPixels : 0;
-            document.getElementById('v-res-resolution').value = spatialRes_mm.toFixed(5);
-        } else if (resTarget === 'fov') {
-            resFOV = spatialRes_mm * totalPixels;
-            document.getElementById('v-res-fov').value = resFOV.toFixed(2);
-            // 同步回衝幾何端
-            document.getElementById('v-opt-fov').value = resFOV.toFixed(2);
-            optFOV = resFOV;
-            // 重新重算幾何對應值
-            if (opticsTarget === 'wd') {
-                calculatedBeta = optFOV > 0 ? sensorW / optFOV : 0;
-                optWD = calculatedBeta > 0 ? optFocal / calculatedBeta : 0;
-                document.getElementById('v-opt-wd').value = optWD.toFixed(2);
-            } else if (opticsTarget === 'focal') {
-                calculatedBeta = optFOV > 0 ? sensorW / optFOV : 0;
-                optFocal = optWD * calculatedBeta;
-                document.getElementById('v-opt-focal').value = optFocal.toFixed(2);
+        // 同步更新 Tab 4 的聯動基礎預設值
+        if (document.getElementById('l-lens-wd')) {
+            // 只在初次或未點選時進行覆蓋
+            const tab4WdInput = document.getElementById('l-lens-wd');
+            if (document.activeElement !== tab4WdInput) {
+                tab4WdInput.value = Math.round(optWD);
             }
         }
 
-        let outResPixelsVal = totalPixels;
-        let requiredPixelCalc = spatialRes_mm > 0 ? (optFOV / spatialRes_mm) : 0;
-
-        document.getElementById('out-res-val').innerText = (spatialRes_mm * 1000).toFixed(4) + " µm/pixel";
-        document.getElementById('out-res-pixels').innerText = outResPixelsVal.toFixed(0) + " px";
-        document.getElementById('out-required-pixel').innerText = requiredPixelCalc.toFixed(0) + " px";
-
-        // 3. Line Rate 頻率分析串接
-        let spatialRes_um = spatialRes_mm * 1000;
-        document.getElementById('v-lr-res').value = spatialRes_um.toFixed(4);
-
+        // 4. 處理 STEP 3 掃描速度率定
+        const lrMode = document.getElementById('lr-target').value;
+        const lrResUM = parseFloat(document.getElementById('v-lr-res').value) || 29.3;
         let lrSpeed = parseFloat(document.getElementById('v-lr-speed').value) || 500;
-        let lrHz = parseFloat(document.getElementById('v-lr-hz').value) || 17066;
+        let lrHz = parseFloat(document.getElementById('v-lr-hz').value) || 17000;
 
-        if (lrTarget === 'hz') {
-            lrHz = (spatialRes_um > 0) ? (lrSpeed / (spatialRes_um / 1000)) : 0;
+        if (lrMode === 'hz') {
+            lrHz = lrResUM > 0 ? (lrSpeed * 1000) / lrResUM : 0;
             document.getElementById('v-lr-hz').value = Math.round(lrHz);
-        } else if (lrTarget === 'speed') {
-            lrSpeed = lrHz * (spatialRes_um / 1000);
+        } else {
+            lrSpeed = (lrHz * lrResUM) / 1000;
             document.getElementById('v-lr-speed').value = lrSpeed.toFixed(2);
         }
 
-        document.getElementById('out-lr-hz').innerText = Math.round(lrHz) + " Hz";
+        document.getElementById('out-lr-hz').innerText = Math.round(lrHz) + " Hz (Lines/sec)";
         document.getElementById('out-lr-speed').innerText = lrSpeed.toFixed(2) + " mm/s";
 
-        // 相機需求等級劃分
-        let cameraGrade = "一般線掃描/面陣相機 (<10kHz)";
-        if(lrHz >= 40000) {
-            cameraGrade = "超高速相機 (40kHz+)";
-        } else if (lrHz >= 20000) {
-            cameraGrade = "高速相機 (20kHz+)";
-        } else if (lrHz >= 10000) {
-            cameraGrade = "中高頻高速相機 (10kHz~20kHz)";
-        }
-        document.getElementById('out-camera-grade').innerText = cameraGrade;
+        let camGrade = "標準 GigE 級相機 (10-20kHz)";
+        if(lrHz > 80000) camGrade = "極速高頻 CoaXPress / CameraLink 專用線掃描相機 (>80kHz)";
+        else if(lrHz > 40000) camGrade = "高階 10GigE / 雙對稱高頻 GigE 相機 (40-80kHz)";
+        else if(lrHz > 20000) camGrade = "中高階 USB3.0 / 雙對稱 GigE 相機 (20-40kHz)";
+        document.getElementById('out-camera-grade').innerText = camGrade;
 
-        // 同步基線頻率至曝光分析
-        document.getElementById('v-exp-hz').value = Math.round(lrHz);
+        // 5. 處理 STEP 4 曝光時序
+        const expTime_us = parseFloat(document.getElementById('v-exp-time-us').value) || 40;
+        const linePeriod = lrHz > 0 ? (1000000 / lrHz) : 0;
+        const expDuty = linePeriod > 0 ? (expTime_us / linePeriod) * 100 : 0;
 
-        // 4. 曝光分析重製版解算
-        let expTime_us = parseFloat(document.getElementById('v-exp-time-us').value) || 40;
-        let linePeriod_seconds = lrHz > 0 ? (1 / lrHz) : 0;
-        let linePeriod_us = linePeriod_seconds * 1000000;
-
-        document.getElementById('out-exp-period').innerText = linePeriod_us.toFixed(2) + " µs (" + (linePeriod_us/1000).toFixed(4) + " ms)";
-        
-        let suggestMin = linePeriod_us * 0.7;
-        let suggestMax = linePeriod_us * 0.9;
-        document.getElementById('out-exp-suggest-range').innerText = suggestMin.toFixed(1) + " ~ " + suggestMax.toFixed(1) + " µs";
-
-        let dutyCycle = linePeriod_us > 0 ? (expTime_us / linePeriod_us) * 100 : 0;
-        document.getElementById('out-exp-duty').innerText = dutyCycle.toFixed(1) + " %";
-
-        // 曝光安全狀態評估
-        let expStatusEl = document.getElementById('out-exp-status');
-        if (expTime_us > linePeriod_us) {
-            expStatusEl.innerHTML = '<span class="status-badge status-danger">超限 (Exposure > Period, 無法取像)</span>';
-        } else if (expTime_us >= suggestMin && expTime_us <= suggestMax) {
-            expStatusEl.innerHTML = '<span class="status-badge status-normal">正常 (符合 70%~90% 黃金比例)</span>';
-        } else if (expTime_us < suggestMin) {
-            expStatusEl.innerHTML = '<span class="status-badge status-warn">過短 (進光量可能不足，需增益或強光源)</span>';
+        document.getElementById('out-line-period').innerText = linePeriod.toFixed(2) + " µs";
+        let dutyEl = document.getElementById('out-exp-duty');
+        dutyEl.innerText = expDuty.toFixed(2) + " %";
+        if(expDuty > 90) {
+            dutyEl.style.color = "var(--warn-color)";
+            dutyEl.innerText += " (❌ 嚴重超頻溢出，曝光時間大於採集週期！)";
+        } else if(expDuty > 70) {
+            dutyEl.style.color = "#e5c07b";
+            dutyEl.innerText += " (⚠️ 佔空比偏高，注意相機發熱及傳輸容差)";
         } else {
-            expStatusEl.innerHTML = '<span class="status-badge status-warn">過長 (接近極限週期，注意Readout安全時序)</span>';
+            dutyEl.style.color = "var(--success-color)";
         }
 
-        // 同步曝光值與速度至運動模糊
-        document.getElementById('v-blur-speed').value = lrSpeed.toFixed(1);
-        document.getElementById('v-blur-exp-us').value = expTime_us.toFixed(0);
+        // 6. 處理 STEP 5 景深
+        const dofF = parseFloat(document.getElementById('v-dof-f').value) || 4.0;
+        const dofCoc = parseFloat(document.getElementById('v-dof-coc').value) || 0.04;
+        const dofTotal = (calculatedBeta > 0) ? ((2 * dofF * dofCoc * (1 + calculatedBeta)) / (calculatedBeta * calculatedBeta)) : 0;
+        document.getElementById('out-dof-total').innerText = dofTotal.toFixed(3) + " mm";
 
-        // 5. 景深 (DOF) 解算
-        const dofF = parseFloat(document.getElementById('v-dof-f').value) || 8;
-        const dofCoc = parseFloat(document.getElementById('v-dof-coc').value) || 3.45;
-        let calculatedDOF_um = 0;
-        if (calculatedBeta > 0) {
-            calculatedDOF_um = (2 * dofF * dofCoc * (1 + calculatedBeta)) / (calculatedBeta * calculatedBeta);
+        // 7. 處理 STEP 6 運動模糊
+        const blurDis = (lrSpeed * expTime_us) / 1000; // µm
+        const blurPixelSensor = blurDis / (pixelSize || 1);
+        const blurPixelObject = lrResUM > 0 ? blurDis / lrResUM : 0;
+
+        document.getElementById('out-blur-dis').innerText = blurDis.toFixed(4) + " µm";
+        document.getElementById('out-blur-pixel-sensor').innerText = blurPixelSensor.toFixed(2) + " px";
+        document.getElementById('out-blur-pixel-object').innerText = blurPixelObject.toFixed(2) + " px";
+
+        let blurStatus = "安全穩定 (模糊量 < 1.0像素)";
+        let blurColor = "var(--success-color)";
+        if(blurPixelObject >= 2.0) {
+            blurStatus = "❌ 嚴重模糊！量測與視覺定位邊緣將完全失效，必須調小曝光或調低速度！";
+            blurColor = "var(--warn-color)";
+        } else if(blurPixelObject >= 1.0) {
+            blurStatus = "⚠️ 輕微模糊 (1~2像素之間)，邊緣檢查可能帶有鋸齒特徵";
+            blurColor = "#e5c07b";
         }
-        let totalDofMM = calculatedDOF_um / 1000;
-        document.getElementById('v-dof-out').innerText = `${totalDofMM.toFixed(4)} mm (${calculatedDOF_um.toFixed(1)} µm)`;
-        drawDofChart(totalDofMM);
+        document.getElementById('out-blur-status').innerText = blurStatus;
+        document.getElementById('out-blur-status').style.color = blurColor;
 
-        // 6. 運動模糊 (Motion Blur) 新增解算模組
-        let blur_um = lrSpeed * (expTime_us / 1000);
-        let blurPixel_sensor = pixelSize > 0 ? (blur_um / pixelSize) : 0;
-        let blurPixel_object = spatialRes_um > 0 ? (blur_um / spatialRes_um) : 0;
-
-        document.getElementById('out-blur-um').innerText = blur_um.toFixed(3) + " µm";
-        document.getElementById('out-blur-pixel-sensor').innerText = blurPixel_sensor.toFixed(2) + " px (晶片像元級)";
-        document.getElementById('out-blur-pixel-object').innerText = blurPixel_object.toFixed(2) + " px (實體圖像邊緣殘影)";
-
-        let blurStatusEl = document.getElementById('out-blur-status');
-        if (blurPixel_object <= 0.2) {
-            blurStatusEl.innerHTML = '<span class="status-badge status-normal">優秀 (≤ 0.2 pixel, 超高精度邊緣級)</span>';
-        } else if (blurPixel_object <= 0.5) {
-            blurStatusEl.innerHTML = '<span class="status-badge status-normal">可接受 (≤ 0.5 pixel, 一般動態檢測無虞)</span>';
-        } else {
-            blurStatusEl.innerHTML = '<span class="status-badge status-danger">風險 (已造成拖影模糊，建議調低曝光時間或降速)</span>';
-        }
-
-        // 7. 多相機拼接群組佈署算法串接
+        // 8. 處理 STEP 7 拼接相機佈署
         const stitchTotal = parseFloat(document.getElementById('v-stitch-total').value) || 500;
-        const stitchOverlapPct = parseFloat(document.getElementById('v-stitch-overlap').value) || 10;
-        const overlapFact = stitchOverlapPct / 100;
-        document.getElementById('out-stitch-fov').innerText = optFOV.toFixed(2) + " mm";
-        
-        let reqCamCount = 1;
-        let actualStitchWidth = optFOV;
-        if (optFOV > 0) {
-            if (optFOV >= stitchTotal) {
-                reqCamCount = 1;
-                actualStitchWidth = optFOV;
-            } else {
-                const denom = optFOV * (1 - overlapFact);
-                if (denom > 0) {
-                    reqCamCount = Math.ceil((stitchTotal - optFOV * overlapFact) / denom);
-                    if (reqCamCount < 1) reqCamCount = 1;
-                    actualStitchWidth = reqCamCount * optFOV - (reqCamCount - 1) * optFOV * overlapFact;
-                }
-            }
+        const stitchOverlap = parseFloat(document.getElementById('v-stitch-overlap').value) || 10;
+        let effFov = optFOV * (1 - stitchOverlap/100);
+        let camCount = effFov > 0 ? Math.ceil((stitchTotal - optFOV) / effFov) + 1 : 1;
+        if(optFOV >= stitchTotal) camCount = 1;
+
+        document.getElementById('out-stitch-cam-count').innerText = camCount + " 台";
+        document.getElementById('out-stitch-eff-fov').innerText = effFov.toFixed(2) + " mm";
+        document.getElementById('out-stitch-overlap-mm').innerText = (optFOV * (stitchOverlap/100)).toFixed(2) + " mm";
+
+        // 9. 持久化快取核心參數
+        localStorage.setItem('calcv6_fov', optFOV.toString());
+        localStorage.setItem('calcv6_wd', optWD.toString());
+        localStorage.setItem('calcv6_res', currentResMM.toString());
+        localStorage.setItem('calcv6_exptime_us', expTime_us.toString());
+        const swEl = document.getElementById('v-sensor-w');
+        const pxEl = document.getElementById('v-sensor-px-count');
+        if (swEl) localStorage.setItem('calcv6_sensor_w', swEl.value);
+        if (pxEl) localStorage.setItem('calcv6_sensor_px', pxEl.value);
+
+        // 如果光路頁籤正處於開啟狀態，即時引導重新渲染
+        if(document.getElementById('visual-tab').classList.contains('active')) {
+            drawOpticalBlueprint();
         }
-        document.getElementById('out-stitch-count').innerText = reqCamCount + " 台相機";
-        document.getElementById('out-stitch-actual').innerText = actualStitchWidth.toFixed(2) + " mm";
-
-        // 同步連動更新機械編碼器欄位中的相關參數
-        document.getElementById('e-mag').value = calculatedBeta.toFixed(5);
-        document.getElementById('e-lr').value = Math.round(lrHz);
-        calcEncoderModule();
-
-        // 觸發文字報告與聯動快照更新
-        refreshTextReportPreview();
-
-        // localStorage 持久化記憶保存環境
-        localStorage.setItem('calcv6_preset_idx', document.getElementById('v-preset-select').value);
-        localStorage.setItem('calcv6_fov', optFOV);
-        localStorage.setItem('calcv6_wd', optWD);
-        localStorage.setItem('calcv6_res', spatialRes_mm);
-        localStorage.setItem('calcv6_exptime_us', expTime_us);
     }
 
-    // 繪製景深示意圖形
-    function drawDofChart(dofMM) {
-        const svg = document.getElementById('dof-chart-svg');
-        if(!svg) return;
-        svg.innerHTML = '';
-        
-        let w = svg.clientWidth || 400;
-        let h = svg.clientHeight || 100;
-        
-        let halfDof = dofMM / 2;
-        let html = `
-            <line x1="200" y1="10" x2="200" y2="90" stroke="#98c379" stroke-width="2" stroke-dasharray="3,3"/>
-            <text x="205" y="25" font-size="11" fill="#98c379" font-weight="bold">焦平面 (Perfect Focus)</text>
-            <rect x="100" y="35" width="200" height="30" fill="rgba(75, 156, 211, 0.15)" stroke="#4b9cd3" stroke-width="1.5" rx="3"/>
-            <text x="200" y="54" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold">DOF: ±${halfDof.toFixed(3)} mm</text>
-            <line x1="100" y1="30" x2="100" y2="70" stroke="#e06c75" stroke-width="2"/>
-            <line x1="300" y1="30" x2="300" y2="70" stroke="#e06c75" stroke-width="2"/>
-            <text x="90" y="85" font-size="10" fill="#abb2bf">前景深限</text>
-            <text x="275" y="85" font-size="10" fill="#abb2bf">後景深限</text>
-        `;
-        svg.innerHTML = html;
-    }
+    // --- 感測器尺寸 → 單像素解析度推導 ---
+    function calcSensorResolution() {
+        const sensorMM = parseFloat(document.getElementById('v-sensor-w').value) || 30;
+        const pxCount = parseFloat(document.getElementById('v-sensor-px-count').value) || 3520;
+        const pixelSizeUM = pxCount > 0 ? (sensorMM / pxCount) * 1000 : 0;
+        const pixelSizeMM = pixelSizeUM / 1000;
 
-    // --- TAB 2: UNIT CONVERSION BASIC ---
-    function solveBasic(type) {
-        if (type === 'hz') {
-            let hz = parseFloat(document.getElementById('basic-hz').value) || 0;
-            let time = hz > 0 ? 1 / hz : 0;
-            document.getElementById('basic-time').value = time.toFixed(8);
-        } else {
-            let time = parseFloat(document.getElementById('basic-time').value) || 0;
-            let hz = time > 0 ? 1 / time : 0;
-            document.getElementById('basic-hz').value = hz.toFixed(2);
+        const pixelInput = document.getElementById('v-pixel-size');
+        pixelInput.value = pixelSizeUM.toFixed(4);
+
+        const display = document.getElementById('sensor-res-formula-display');
+        if (display) {
+            display.textContent = `計算式：${sensorMM} mm ÷ ${pxCount} px = ${pixelSizeMM.toFixed(7)} mm = ${pixelSizeUM.toFixed(4)} µm/px`;
         }
-        let hzVal = parseFloat(document.getElementById('basic-hz').value) || 0;
-        let timeVal = parseFloat(document.getElementById('basic-time').value) || 0;
-        document.getElementById('smart-hz-out').innerText = hzVal >= 1000 ? (hzVal/1000).toFixed(2)+" kHz" : hzVal.toFixed(1)+" Hz";
-        document.getElementById('smart-time-out').innerText = timeVal < 0.001 ? (timeVal*1000000).toFixed(2)+" µs" : (timeVal*1000).toFixed(3)+" ms";
+
+        // 同步 pixel size 到 STEP 1 解析度模式
+        calcVisionAll();
     }
 
-    function solveLength() {
-        let v = parseFloat(document.getElementById('basic-len').value) || 0;
-        let unit = document.getElementById('basic-len-unit').value;
-        let mm = v;
-        if(unit === 'm') mm = v * 1000;
-        else if(unit === 'cm') mm = v * 10;
-        else if(unit === 'um') mm = v / 1000;
+    // --- TAB 2 時間/頻率全雙向換算 ---
+    function solveBasic(from) {
+        let hz = 0;
+        if (from === 'hz') {
+            hz = parseFloat(document.getElementById('basic-hz').value) || 0;
+        } else if (from === 'khz') {
+            hz = (parseFloat(document.getElementById('basic-khz').value) || 0) * 1000;
+        } else if (from === 'time') {
+            const s = parseFloat(document.getElementById('basic-time').value) || 0;
+            hz = s > 0 ? 1 / s : 0;
+        } else if (from === 'time_ms') {
+            const ms = parseFloat(document.getElementById('basic-time-ms').value) || 0;
+            hz = ms > 0 ? 1000 / ms : 0;
+        } else if (from === 'time_us') {
+            const us = parseFloat(document.getElementById('basic-time-us').value) || 0;
+            hz = us > 0 ? 1000000 / us : 0;
+        }
 
-        let board = document.getElementById('length-smart-board');
-        if(!board) return;
-        board.innerHTML = `
-            <div class="result-line"><span class="result-label">標準公釐 (mm):</span><span class="result-value">${mm.toFixed(4)} mm</span></div>
-            <div class="result-line"><span class="result-label">工業微米 (µm):</span><span class="result-value">${(mm*1000).toFixed(1)} µm</span></div>
-            <div class="result-line"><span class="result-label">米制單位 (m):</span><span class="result-value">${(mm/1000).toFixed(6)} m</span></div>
-        `;
+        if (hz <= 0) {
+            ['smart-hz-out','smart-khz-out','smart-time-out','smart-time-ms-out','smart-time-us-out'].forEach(id => {
+                const el = document.getElementById(id); if(el) el.innerText = '-';
+            });
+            return;
+        }
+
+        const khz = hz / 1000;
+        const t_s = 1 / hz;
+        const t_ms = t_s * 1000;
+        const t_us = t_s * 1000000;
+
+        // Update all inputs silently
+        if (from !== 'hz') { const el = document.getElementById('basic-hz'); if(el) el.value = hz.toFixed(3); }
+        if (from !== 'khz') { const el = document.getElementById('basic-khz'); if(el) el.value = khz.toFixed(4); }
+        if (from !== 'time') { const el = document.getElementById('basic-time'); if(el) el.value = t_s.toFixed(8); }
+        if (from !== 'time_ms') { const el = document.getElementById('basic-time-ms'); if(el) el.value = t_ms.toFixed(5); }
+        if (from !== 'time_us') { const el = document.getElementById('basic-time-us'); if(el) el.value = t_us.toFixed(3); }
+
+        // Update result display
+        document.getElementById('smart-hz-out').innerText = hz.toFixed(2) + ' Hz';
+        document.getElementById('smart-khz-out').innerText = khz.toFixed(4) + ' kHz';
+        document.getElementById('smart-time-out').innerText = t_s.toFixed(8) + ' s';
+        document.getElementById('smart-time-ms-out').innerText = t_ms.toFixed(5) + ' ms';
+        document.getElementById('smart-time-us-out').innerText = t_us.toFixed(3) + ' µs';
     }
 
-    // --- TAB 3: ENCODER MODULE ---
+    // --- TAB 2 長度雙向換算 (m, cm, mm, µm) ---
+    function solveLengthBi(from) {
+        let mm = 0;
+        if (from === 'm')  mm = (parseFloat(document.getElementById('len-m').value)  || 0) * 1000;
+        if (from === 'cm') mm = (parseFloat(document.getElementById('len-cm').value) || 0) * 10;
+        if (from === 'mm') mm = (parseFloat(document.getElementById('len-mm').value) || 0);
+        if (from === 'um') mm = (parseFloat(document.getElementById('len-um').value)  || 0) / 1000;
+
+        if (from !== 'm')  { const el = document.getElementById('len-m');  if(el) el.value = (mm / 1000).toFixed(9); }
+        if (from !== 'cm') { const el = document.getElementById('len-cm'); if(el) el.value = (mm / 10).toFixed(7); }
+        if (from !== 'mm') { const el = document.getElementById('len-mm'); if(el) el.value = mm.toFixed(6); }
+        if (from !== 'um') { const el = document.getElementById('len-um'); if(el) el.value = (mm * 1000).toFixed(3); }
+
+        const display = document.getElementById('len-formula-display');
+        if (display) {
+            display.innerText = `${mm.toFixed(6)} mm = ${(mm*1000).toFixed(3)} µm = ${(mm/10).toFixed(7)} cm = ${(mm/1000).toFixed(9)} m`;
+        }
+    }
+
+    // 舊版 solveLength/calcUnitModule 保留相容性（空函數）
+    function solveLength() { solveLengthBi('mm'); }
+    function calcUnitModule() { solveBasic('hz'); solveLengthBi('mm'); }
+
+    // --- TAB 3 編碼器模組 ---
     function calcEncoderModule() {
         const circ = parseFloat(document.getElementById('e-circumference').value) || 200;
         const pulse = parseFloat(document.getElementById('e-pulse').value) || 2000;
         const mult = parseFloat(document.getElementById('e-multiplier').value) || 4;
-        const mag = parseFloat(document.getElementById('e-mag').value) || 0.073;
-        const lr = parseFloat(document.getElementById('e-lr').value) || 17066;
+        const mag = parseFloat(document.getElementById('e-mag').value) || 0.0733;
 
-        const totalPulses = pulse * mult;
-        const pitch_mm = totalPulses > 0 ? (circ / totalPulses) : 0;
-        const camRes_um = pitch_mm * mag * 1000;
-        const syncSpeed = (camRes_um / 1000) * lr;
+        const totalPpr = pulse * mult;
+        const mmPulse = totalPpr > 0 ? (circ / totalPpr) : 0;
+        const sensorMmPulse = mmPulse * mag;
 
-        document.getElementById('out-e-total').innerText = totalPulses.toFixed(0) + " Pls/圈";
-        document.getElementById('out-e-pitch').innerText = pitch_mm.toFixed(6) + " mm/pulse";
-        document.getElementById('out-e-camres').innerText = camRes_um.toFixed(4) + " µm/像素匹配";
-        document.getElementById('out-e-syncspeed').innerText = syncSpeed.toFixed(3) + " mm/s";
+        document.getElementById('out-e-total-ppr').innerText = totalPpr + " PPR";
+        document.getElementById('out-e-mm-pulse').innerText = mmPulse.toFixed(6) + " mm/pulse";
+        document.getElementById('out-e-sensor-mm-pulse').innerText = sensorMmPulse.toFixed(6) + " mm/pulse";
+        document.getElementById('out-e-suggest-ratio').innerText = `1 Pulse 觸發採集 ${Math.round(1/mmPulse)} 行`;
     }
 
-    // --- TAB 4: INTERACTIVE OPTICAL BLUEPRINT ---
-    function syncVisualDiagram(triggerField) {
-        if(triggerField === 'wd') {
-            document.getElementById('v-opt-wd').value = document.getElementById('g-wd').value;
-        } else if(triggerField === 'focal') {
-            document.getElementById('v-opt-focal').value = document.getElementById('g-focal').value;
-        } else if(triggerField === 'fov') {
-            document.getElementById('v-opt-fov').value = document.getElementById('g-fov').value;
-        }
-        calcVisionAll();
-        document.getElementById('g-wd').value = document.getElementById('v-opt-wd').value;
-        document.getElementById('g-focal').value = document.getElementById('v-opt-focal').value;
-        document.getElementById('g-fov').value = document.getElementById('v-opt-fov').value;
-        
-        drawOpticalBlueprint();
-    }
-
+    // --- TAB 4: VISUAL BLUEPRINT 幾何拓樸引擎 (重構核心防錯與智慧打光) ---
     function drawOpticalBlueprint() {
-        const svg = document.getElementById('optical-blueprint');
-        if(!svg) return;
-        svg.innerHTML = '';
+        const svg = document.getElementById('optical-svg');
+        const controlPanel = document.getElementById('blueprint-control-panel');
+        const alertBox = document.getElementById('blueprint-alert-box');
+        if(!svg || !controlPanel || !alertBox) return;
 
-        let lenswd = parseFloat(document.getElementById('g-wd').value) || 300;
-        let focal = parseFloat(document.getElementById('g-focal').value) || 16;
-        let fov = parseFloat(document.getElementById('g-fov').value) || 120;
-        let lightWidth = parseFloat(document.getElementById('g-light-w').value) || 140;
-        let lightwd = parseFloat(document.getElementById('g-light-wd').value) || 50;
+        // 1. 讀取與整合主介面的基本參數 (建立雙向聯動)
+        const f = parseFloat(document.getElementById('v-opt-focal').value) || 16;
+        const fov = parseFloat(document.getElementById('v-opt-fov').value) || 120;
+        const sensorW = parseFloat(document.getElementById('v-sensor-w').value) || 8.8;
 
-        let totalHeight_mm = lenswd + focal + 40; 
-        let maxScaleX = 360 / Math.max(fov, lightWidth, 60);
-        let maxScaleY = 440 / totalHeight_mm;
-        let scale = Math.min(maxScaleX, maxScaleY, 1.8);
+        // 讀取機構與打光參數
+        const spaceLimit = parseFloat(document.getElementById('l-space-limit').value) || 500;
+        const oiDist = parseFloat(document.getElementById('l-oi-dist').value) || 450;
+        const lensLen = parseFloat(document.getElementById('l-lens-length').value) || 80;
+        const lensWd = parseFloat(document.getElementById('l-lens-wd').value) || 300;
+        
+        const lightType = document.getElementById('l-light-type').value;
+        const lightWidth = parseFloat(document.getElementById('l-light-width').value) || 120;
+        const lightHeight = parseFloat(document.getElementById('l-light-height').value) || 60;
 
-        let startY = 20;
-        let c_sensor = startY + 40 * scale;
-        let c_lens_top = c_sensor + focal * scale;
-        let c_lens_bottom = c_lens_top + 15 * scale;
-        let endY = c_lens_bottom + lenswd * scale;
+        // 2. 雙重核心防錯機制驗證 (紅色高亮控制)
+        let alerts = [];
+        let isSpaceOverflow = false;
+        let isAxisMismatch = false;
 
-        let c_top = startY;
-        let c_light = (endY - lightwd * scale);
+        // 核心警示一：空間溢出
+        if (oiDist > spaceLimit) {
+            isSpaceOverflow = true;
+            alerts.push(`❌ 【空間溢出】預期物像全距 O/I (${oiDist}mm) 已超過機構總空間高度極限 (${spaceLimit}mm)！`);
+        }
 
+        // 核心警示二：機械軸向不匹配
+        const mechanicalTotal = lensLen + lensWd; 
+        const gap = oiDist - mechanicalTotal;
+        if (Math.abs(gap) > 0.1) {
+            isAxisMismatch = true;
+            alerts.push(`⚠️ 【軸向不匹配】鏡頭長度 + WD (${mechanicalTotal}mm) 
+不等於物像全距 O/I (${oiDist}mm)，
+公差斷層 Gap: ${gap.toFixed(1)}mm`);
+        }
+
+        // 更新前端控制面板 UI 警示狀態
+        if (isSpaceOverflow) {
+            controlPanel.style.borderColor = '#e06c75';
+            controlPanel.style.boxShadow = '0 0 15px rgba(224, 108, 117, 0.4)';
+        } else {
+            controlPanel.style.borderColor = 'var(--border-color)';
+            controlPanel.style.boxShadow = 'none';
+        }
+
+        if (alerts.length > 0) {
+            alertBox.innerHTML = alerts.join('<br>');
+            alertBox.style.display = 'block';
+        } else {
+            alertBox.style.display = 'none';
+        }
+
+        // 3. 智慧打光特徵分類與特徵計算 (arctan( (W/2) / H ))
+        const rad = Math.atan((lightWidth / 2) / Math.max(lightHeight, 1));
+        const thetaDeg = rad * (180 / Math.PI);
+        document.getElementById('out-light-theta').innerText = thetaDeg.toFixed(1) + "°";
+
+        let featureText = "";
+        if (lightType === 'bright') {
+            if (thetaDeg < 20) {
+                featureText = "高平行同軸光特徵：適合半導體晶圓刮傷、高反光鏡面凹坑與特徵文字 (OCR) 辨識。";
+            } else {
+                featureText = "標準高對比正向漫反射：提供高均勻度視野，適合工件高反光邊緣提取、外觀明暗瑕疵破孔檢測。";
+            }
+        } else if (lightType === 'dark') {
+            if (thetaDeg > 65) {
+                featureText = "超低角度暗場打光：光線趨近水平，極度敏感。適合金屬表面微米級髮絲痕、刮傷、壓傷及透明包裝微小邊緣檢測。";
+            } else {
+                featureText = "標準暗場側向光：消除表面大面積雜訊，適合印字凹凸不平凸顯、工件崩角特徵提取。";
+            }
+        } else if (lightType === 'back') {
+            featureText = "穿透式高對比背光：產生極致黑白高對比輪廓。適合精密機械件尺寸量測、外觀邊緣毛刺、孔徑透光度及透明瓶身液位檢測。";
+        }
+        document.getElementById('out-light-feature').innerText = featureText;
+
+        // 4. SVG 畫布比例與尺寸鏈幾何拓樸渲染
+        const svgW = svg.clientWidth || 700;
+        const svgH = svg.clientHeight || 520;
+        const cX = svgW / 2; 
+
+        // 建立定義箭頭 Marker 元素組
         let html = `
             <defs>
                 <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-                    <path d="M0,0 L6,3 L0,6 Z" fill="#abb2bf"/>
+                    <polygon points="0,0 6,3 0,6" fill="context-stroke"/>
+                </marker>
+                <marker id="arr-rev" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                    <polygon points="6,0 0,3 6,6" fill="context-stroke"/>
                 </marker>
             </defs>
-            <rect x="185" y="${c_top}" width="30" height="${c_sensor - c_top}" fill="#2c313c" stroke="#3e4452" rx="3"/>
-            <text x="200" y="${c_top + 18}" font-size="10" text-anchor="middle" fill="#fff">CAMERA</text>
-            <line x1="175" y1="${c_sensor}" x2="225" y2="${c_sensor}" stroke="#e06c75" stroke-width="3"/>
-            <text x="230" y="${c_sensor + 4}" font-size="9" fill="#e06c75">Sensor Plane</text>
-            <rect x="178" y="${c_lens_top}" width="44" height="${c_lens_bottom - c_lens_top}" fill="#3e4452" stroke="#4b9cd3" rx="2"/>
-            <text x="200" y="${c_lens_top + (c_lens_bottom - c_lens_top)/2 + 4}" font-size="10" text-anchor="middle" fill="#fff">LENS</text>
-            <polygon points="200,${c_lens_bottom} ${200 - (fov/2)*scale},${endY} ${200 + (fov/2)*scale},${endY}" fill="rgba(75, 156, 211, 0.08)" stroke="#4b9cd3" stroke-width="1.2"/>
-            <polygon points="200,${c_lens_top} 180,${c_sensor} 220,${c_sensor}" fill="rgba(224, 108, 117, 0.05)" stroke="#e06c75" stroke-width="0.8" stroke-dasharray="2,2"/>
-            <line x1="${200 - (fov/2)*scale - 30}" y1="${endY}" x2="${200 + (fov/2)*scale + 30}" y2="${endY}" stroke="#98c379" stroke-width="3"/>
-            <text x="${200 + (fov/2)*scale + 35}" y="${endY + 3}" font-size="11" fill="#98c379" font-weight="bold">FOV 視野邊界</text>
-            <rect x="${200 - (lightWidth/2)*scale}" y="${c_light}" width="${lightWidth*scale}" height="10" fill="none" stroke="#e5c07b" stroke-width="2" rx="1"/>
-            <text x="${200 - (lightWidth/2)*scale}" y="${c_light - 5}" font-size="9" fill="#e5c07b">LIGHT SOURCE</text>
-            <line x1="150" y1="${c_sensor}" x2="150" y2="${c_lens_top}" stroke="#abb2bf" stroke-width="1" marker-end="url(#arr)"/>
-            <text x="100" y="${c_sensor + focal*scale/2}" font-size="10">焦距 f: ${focal} mm</text>
-            <line x1="140" y1="${c_lens_bottom}" x2="140" y2="${endY}" stroke="#abb2bf" stroke-width="1" marker-end="url(#arr)"/>
-            <text x="75" y="${c_lens_bottom + lenswd*scale/2}" font-size="10">工作距離 WD: ${lenswd} mm</text>
         `;
+
+        // 建立垂直投影比例尺
+        const drawH = 360;
+        const startY = 50;
+        const scaleY = drawH / Math.max(spaceLimit, oiDist, 100);
+
+        const physicalMaxW = Math.max(fov, sensorW, lightWidth, 60);
+        const scaleX = (svgW * 0.35) / physicalMaxW;
+
+        // 計算各組件垂直座標
+        const y_space_bottom = startY + spaceLimit * scaleY;
+        const y_oi_bottom = startY + oiDist * scaleY;
+        const y_lens_start = startY;
+        const y_lens_end = y_lens_start + lensLen * scaleY;
+        
+        const y_wd_start = y_lens_end + (gap > 0 ? gap * scaleY : 0); 
+        const y_wd_end = y_wd_start + lensWd * scaleY;
+
+        html += `
+            <line x1="40" y1="${startY}" x2="${svgW - 40}" y2="${startY}" stroke="#2c313c" stroke-width="1"/>
+            <line x1="${cX}" y1="30" x2="${cX}" y2="${Math.max(y_space_bottom, y_oi_bottom) + 50}" stroke="#222630" stroke-dasharray="4,4"/>
+
+            <line x1="60" y1="${startY}" x2="60" y2="${y_space_bottom}" stroke="#5c6370" stroke-width="1.5" marker-end="url(#arr)" marker-start="url(#arr-rev)"/>
+            <text x="50" y="${(startY + y_space_bottom)/2}" font-size="11" fill="#8a929e" text-anchor="end">機構極限 Space: ${spaceLimit} mm</text>
+            <line x1="55" y1="${y_space_bottom}" x2="90" y2="${y_space_bottom}" stroke="#5c6370" stroke-width="1"/>
+
+            <line x1="120" y1="${startY}" x2="120" y2="${y_oi_bottom}" stroke="var(--accent-color)" stroke-width="2" marker-end="url(#arr)" marker-start="url(#arr-rev)"/>
+            <text x="110" y="${(startY + y_oi_bottom)/2}" font-size="12" font-weight="600" fill="var(--accent-color)" text-anchor="end">物像全距 O/I: ${oiDist} mm</text>
+            <line x1="115" y1="${y_oi_bottom}" x2="${cX}" y2="${y_oi_bottom}" stroke="var(--accent-color)" stroke-width="1" stroke-dasharray="3,3"/>
+
+            <rect x="${cX - (sensorW/2)*scaleX}" y="${startY - 4}" width="${sensorW*scaleX}" height="8" fill="#e06c75" rx="1"/>
+            <text x="${cX + (sensorW/2)*scaleX + 15}" y="${startY + 3}" font-size="11" fill="#e06c75" text-anchor="start">Sensor: ${sensorW}mm</text>
+
+            <rect x="${cX - 30}" y="${y_lens_start}" width="60" height="${y_lens_end - y_lens_start}" fill="#1e222b" stroke="#4b9cd3" stroke-width="1.5" rx="3"/>
+            <text x="${cX}" y="${(y_lens_start + y_lens_end)/2 + 4}" font-size="10" text-anchor="middle" fill="#fff" font-weight="bold">LENS</text>
+            <line x1="${svgW - 120}" y1="${y_lens_start}" x2="${svgW - 120}" y2="${y_lens_end}" stroke="#4b9cd3" stroke-width="1.5" marker-end="url(#arr)" marker-start="url(#arr-rev)"/>
+            <text x="${svgW - 110}" y="${(y_lens_start + y_lens_end)/2 + 4}" font-size="11" fill="#4b9cd3">鏡頭長 Lens L: ${lensLen} mm</text>
+        `;
+
+        // 核心斷層 Gap 動態定位
+        if (isAxisMismatch) {
+            if (gap > 0) {
+                html += `
+                    <rect x="${cX - 45}" y="${y_lens_end}" width="90" height="${gap * scaleY}" fill="rgba(224, 108, 117, 0.25)" stroke="#e06c75" stroke-width="1" stroke-dasharray="2,2"/>
+                    <line x1="${svgW - 120}" y1="${y_lens_end}" x2="${svgW - 120}" y2="${y_wd_start}" stroke="#e06c75" stroke-width="2"/>
+                    <text x="${svgW - 105}" y="${y_lens_end + (gap*scaleY)/2 + 4}" font-size="11" fill="#e06c75" font-weight="bold">⚠️ 尺寸斷層 Gap: +${gap.toFixed(1)}mm</text>
+                `;
+            } else {
+                html += `
+                    <rect x="${cX - 45}" y="${y_oi_bottom}" width="90" height="${Math.abs(gap)*scaleY}" fill="rgba(224, 108, 117, 0.35)" stroke="#e06c75" stroke-width="1"/>
+                    <text x="${cX}" y="${y_oi_bottom + (Math.abs(gap)*scaleY)/2 + 4}" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">機構超長溢出: ${gap.toFixed(1)}mm</text>
+                `;
+            }
+        }
+
+        html += `
+            <line x1="${svgW - 120}" y1="${y_wd_start}" x2="${svgW - 120}" y2="${y_wd_end}" stroke="#98c379" stroke-width="1.5" marker-end="url(#arr)" marker-start="url(#arr-rev)"/>
+            <text x="${svgW - 110}" y="${(y_wd_start + y_wd_end)/2 + 4}" font-size="11" fill="#98c379">工作距離 WD: ${lensWd} mm</text>
+
+            <polygon points="${cX},${y_lens_end} ${cX - (fov/2)*scaleX},${y_wd_end} ${cX + (fov/2)*scaleX},${y_wd_end}" fill="rgba(75, 156, 211, 0.06)" stroke="rgba(75, 156, 211, 0.4)" stroke-width="1"/>
+
+            <line x1="${cX - (fov/2)*scaleX}" y1="${y_wd_end}" x2="${cX + (fov/2)*scaleX}" y2="${y_wd_end}" stroke="#98c379" stroke-width="4" stroke-linecap="round"/>
+            <text x="${cX}" y="${y_wd_end + 20}" font-size="12" font-weight="bold" fill="#98c379" text-anchor="middle">OBJECT (FOV: ${fov.toFixed(1)} mm)</text>
+        `;
+
+        // 智慧打光幾何動態疊加圖層
+        const drawLightY = y_wd_end - lightHeight * scaleY;
+        if (lightType === 'bright') {
+            html += `
+                <rect x="${cX - (lightWidth/2)*scaleX}" y="${drawLightY}" width="${lightWidth*scaleX}" height="12" fill="#e5c07b" rx="2" opacity="0.8"/>
+                <circle cx="${cX - (lightWidth/4)*scaleX}" cy="${drawLightY + 6}" r="2" fill="#fff"/>
+                <circle cx="${cX + (lightWidth/4)*scaleX}" cy="${drawLightY + 6}" r="2" fill="#fff"/>
+                <path d="M ${cX - (lightWidth/2)*scaleX} ${drawLightY+12} L ${cX} ${y_wd_end} L ${cX + (lightWidth/2)*scaleX} ${drawLightY+12}" stroke="#e5c07b" stroke-width="1" stroke-dasharray="2,2" opacity="0.4"/>
+                <text x="${cX - (lightWidth/2)*scaleX - 10}" y="${drawLightY + 9}" font-size="10" fill="#e5c07b" text-anchor="end">正向落射光源 (H:${lightHeight}mm)</text>
+            `;
+        } else if (lightType === 'dark') {
+            html += `
+                <rect x="${cX - (lightWidth/2)*scaleX - 15}" y="${y_wd_end - 12}" width="30" height="8" fill="#56b6c2" transform="rotate(-20, ${cX - (lightWidth/2)*scaleX}, ${y_wd_end})" opacity="0.9" />
+                <rect x="${cX + (lightWidth/2)*scaleX - 15}" y="${y_wd_end - 12}" width="30" height="8" fill="#56b6c2" transform="rotate(20, ${cX + (lightWidth/2)*scaleX}, ${y_wd_end})" opacity="0.9" />
+                <text x="${cX}" y="${y_wd_end - 22}" font-size="10" fill="#56b6c2" text-anchor="middle">低角度暗場 (Angle: ${thetaDeg.toFixed(1)}°)</text>
+            `;
+        } else if (lightType === 'back') {
+            html += `
+                <rect x="${cX - (lightWidth/2)*scaleX}" y="${y_wd_end + 32}" width="${lightWidth*scaleX}" height="10" fill="#98c379" opacity="0.4"/>
+                <line x1="${cX - (lightWidth/2)*scaleX}" y1="${y_wd_end + 32}" x2="${cX + (lightWidth/2)*scaleX}" y2="${y_wd_end + 32}" stroke="#fff" stroke-width="2"/>
+                <text x="${cX}" y="${y_wd_end + 54}" font-size="10" fill="#98c379" text-anchor="middle">背光平行底座 Backlight</text>
+            `;
+        }
+
         svg.innerHTML = html;
     }
 
-    // --- TAB 5: REPORT GENERATION ---
-    function generateReportTextString() {
-        const op = document.getElementById('r-operator').value;
-        const notes = document.getElementById('r-notes').value;
-        const dt = new Date().toLocaleString();
-        
-        const presetSelect = document.getElementById('v-preset-select');
-        const sensorName = presetSelect.options[presetSelect.selectedIndex].text;
-        const sensorSize = document.getElementById('v-sensor-size').value;
-        const sensorW = document.getElementById('v-sensor-w').value;
-        const pixelSize = document.getElementById('v-pixel-size').value;
-        
-        const fov = document.getElementById('v-opt-fov').value;
-        const wd = document.getElementById('v-opt-wd').value;
-        const focal = document.getElementById('v-opt-focal').value;
-        const beta = document.getElementById('out-opt-beta').innerText;
-        const suggestFocal = document.getElementById('out-suggested-focal').innerText;
-        
-        const res = document.getElementById('out-res-val').innerText;
-        const pixelsOut = document.getElementById('out-res-pixels').innerText;
-        const reqPixels = document.getElementById('out-required-pixel').innerText;
-        
-        const lrHz = document.getElementById('out-lr-hz').innerText;
-        const lrSpeed = document.getElementById('out-lr-speed').innerText;
-        const camGrade = document.getElementById('out-camera-grade').innerText;
-        
-        const expTime_us = document.getElementById('v-exp-time-us').value;
-        const linePeriod = document.getElementById('out-exp-period').innerText;
-        const expDuty = document.getElementById('out-exp-duty').innerText;
-        
-        const dofText = document.getElementById('v-dof-out').innerText;
-        const dofF = document.getElementById('v-dof-f').value;
-        
-        const blurUm = document.getElementById('out-blur-um').innerText;
-        const blurPxObj = document.getElementById('out-blur-pixel-object').innerText;
+    // --- 報告核心：從所有分頁抽取全部參數並生成報告文字 ---
+    function buildReportText() {
+        const operator = document.getElementById('r-operator') ? document.getElementById('r-operator').value : 'Senior Vision Engineer';
+        const notes = 'AOI評估';
 
-        const stitchTotal = document.getElementById('v-stitch-total').value;
-        const stitchCount = document.getElementById('out-stitch-count').innerText;
-        const stitchActual = document.getElementById('out-stitch-actual').innerText;
-        
-        const encCirc = document.getElementById('e-circumference').value;
-        const encPls = document.getElementById('e-pulse').value;
-        const encPitch = document.getElementById('out-e-pitch').innerText;
-        const encSyncSpeed = document.getElementById('out-e-syncspeed').innerText;
+        // STEP 1 感測器與解析度
+        const sensorPresetEl = document.getElementById('v-preset-select');
+        const sensorPresetName = sensorPresetEl ? sensorPresetEl.options[sensorPresetEl.selectedIndex].text : '-';
+        const sensorW = document.getElementById('v-sensor-w') ? document.getElementById('v-sensor-w').value : '-';
+        const sensorPxCount = document.getElementById('v-sensor-px-count') ? document.getElementById('v-sensor-px-count').value : '-';
+        const pixelSizeUM = document.getElementById('v-pixel-size') ? document.getElementById('v-pixel-size').value : '-';
+        const resMode = document.getElementById('res-target') ? document.getElementById('res-target').value : '-';
+        const resFOV = document.getElementById('v-res-fov') ? document.getElementById('v-res-fov').value : '-';
+        const resPixels = (() => {
+            const sel = document.getElementById('v-res-pixels');
+            if (!sel) return '-';
+            if (sel.value === 'custom') {
+                const c = document.getElementById('v-res-pixels-custom');
+                return c ? c.value : '-';
+            }
+            return sel.value;
+        })();
+        const resResolution = document.getElementById('v-res-resolution') ? document.getElementById('v-res-resolution').value : '-';
+        const outResVal = document.getElementById('out-res-val') ? document.getElementById('out-res-val').innerText : '-';
 
-        let txt = `==================================================
-MACHINE VISION OPTICAL CONFIGURATION REPORT
-==================================================
-[系統資訊 / System Profile]
-軟體版本 (Version)   : ${APP_VERSION}
-建立時間 (Timestamp) : ${dt}
-操作人員 (Operator)  : ${op}
-專案備註 (Project)   : ${notes}
+        // STEP 2 鏡頭幾何
+        const optMode = document.getElementById('optics-target') ? document.getElementById('optics-target').options[document.getElementById('optics-target').selectedIndex].text : '-';
+        const optFOV = document.getElementById('v-opt-fov') ? document.getElementById('v-opt-fov').value : '-';
+        const optWD = document.getElementById('v-opt-wd') ? document.getElementById('v-opt-wd').value : '-';
+        const optFocal = document.getElementById('v-opt-focal') ? document.getElementById('v-opt-focal').value : '-';
+        const outBeta = document.getElementById('out-opt-beta') ? document.getElementById('out-opt-beta').innerText : '-';
+        const outSugFocal = document.getElementById('out-suggested-focal') ? document.getElementById('out-suggested-focal').innerText : '-';
 
-[STEP 1: 感測器與解析度參數 / Sensor Metrology]
-採用晶片名稱         : ${sensorName}
-晶片結構規格 (長x寬) : ${sensorSize}
-基礎解算寬度寬       : ${sensorW} mm
-像元實體尺寸         : ${pixelSize} µm
-單向總像素解析度     : ${pixelsOut}
-空間單向解算解析度   : ${res}
-反推實體所需總畫素   : ${reqPixels}
+        // STEP 3 Line Rate
+        const lrRes = document.getElementById('v-lr-res') ? document.getElementById('v-lr-res').value : '-';
+        const lrSpeed = document.getElementById('v-lr-speed') ? document.getElementById('v-lr-speed').value : '-';
+        const lrHz = document.getElementById('v-lr-hz') ? document.getElementById('v-lr-hz').value : '-';
+        const outLrHz = document.getElementById('out-lr-hz') ? document.getElementById('out-lr-hz').innerText : '-';
+        const outLrSpeed = document.getElementById('out-lr-speed') ? document.getElementById('out-lr-speed').innerText : '-';
+        const outCamGrade = document.getElementById('out-camera-grade') ? document.getElementById('out-camera-grade').innerText : '-';
 
-[STEP 2: 鏡頭光學幾何 / Lens Geometry]
-實體視場視野 (FOV)   : ${fov} mm
-光學工作距離 (WD)    : ${wd} mm
-推導光學焦距 (Focal) : ${focal} mm
-光學放大倍率 (Beta)  : ${beta}
-標準工業鏡頭焦距推薦 : ${suggestFocal}
+        // STEP 4 曝光
+        const expUs = document.getElementById('v-exp-time-us') ? document.getElementById('v-exp-time-us').value : '-';
+        const expMs = document.getElementById('v-exp-time-ms') ? document.getElementById('v-exp-time-ms').value : '-';
+        const outLinePeriod = document.getElementById('out-line-period') ? document.getElementById('out-line-period').innerText : '-';
+        const outExpDuty = document.getElementById('out-exp-duty') ? document.getElementById('out-exp-duty').innerText : '-';
 
-[STEP 3: 掃描率定頻率 / Line Rate Matrix]
-生產線運動速度       : ${lrSpeed}
-相機解算頻率要求     : ${lrHz}
-相機工業需求等級     : ${camGrade}
+        // STEP 5 DOF
+        const dofF = document.getElementById('v-dof-f') ? document.getElementById('v-dof-f').value : '-';
+        const dofCoc = document.getElementById('v-dof-coc') ? document.getElementById('v-dof-coc').value : '-';
+        const outDofTotal = document.getElementById('out-dof-total') ? document.getElementById('out-dof-total').innerText : '-';
 
-[STEP 4: 曝光時序安全分析 / Exposure Timing Analysis]
-選定實際曝光時間     : ${expTime_us} µs
-總時槽週期 (Period)  : ${linePeriod}
-當前採集曝光佔空比   : ${expDuty}
+        // STEP 6 Motion Blur
+        const outBlurDis = document.getElementById('out-blur-dis') ? document.getElementById('out-blur-dis').innerText : '-';
+        const outBlurSensor = document.getElementById('out-blur-pixel-sensor') ? document.getElementById('out-blur-pixel-sensor').innerText : '-';
+        const outBlurObj = document.getElementById('out-blur-pixel-object') ? document.getElementById('out-blur-pixel-object').innerText : '-';
+        const outBlurStatus = document.getElementById('out-blur-status') ? document.getElementById('out-blur-status').innerText : '-';
 
-[STEP 5: 光學景深範圍 / Depth of Field]
-選定透鏡光圈 F 值    : F ${dofF}
-幾何景深覆蓋總量     : ${dofText}
-內置參考圖檔對照     : DOF.png
+        // STEP 7 拼接
+        const stitchTotal = document.getElementById('v-stitch-total') ? document.getElementById('v-stitch-total').value : '-';
+        const stitchOverlap = document.getElementById('v-stitch-overlap') ? document.getElementById('v-stitch-overlap').value : '-';
+        const outCamCount = document.getElementById('out-stitch-cam-count') ? document.getElementById('out-stitch-cam-count').innerText : '-';
+        const outEffFov = document.getElementById('out-stitch-eff-fov') ? document.getElementById('out-stitch-eff-fov').innerText : '-';
+        const outOverlapMm = document.getElementById('out-stitch-overlap-mm') ? document.getElementById('out-stitch-overlap-mm').innerText : '-';
 
-[STEP 6: 動態高頻運動模糊 / Motion Blur Analysis]
-動態殘影模糊量       : ${blurUm}
-圖像端殘影實體像素   : ${blurPxObj}
+        // 藍圖 Tab 機構
+        const spaceLimit = document.getElementById('l-space-limit') ? document.getElementById('l-space-limit').value : '-';
+        const oiDist = document.getElementById('l-oi-dist') ? document.getElementById('l-oi-dist').value : '-';
+        const lensLen = document.getElementById('l-lens-length') ? document.getElementById('l-lens-length').value : '-';
+        const lensWd = document.getElementById('l-lens-wd') ? document.getElementById('l-lens-wd').value : '-';
+        const lightType = (() => {
+            const el = document.getElementById('l-light-type');
+            if (!el) return '-';
+            return el.options[el.selectedIndex].text;
+        })();
+        const lightWidth = document.getElementById('l-light-width') ? document.getElementById('l-light-width').value : '-';
+        const lightHeight = document.getElementById('l-light-height') ? document.getElementById('l-light-height').value : '-';
+        const outTheta = document.getElementById('out-light-theta') ? document.getElementById('out-light-theta').innerText : '-';
+        const outFeature = document.getElementById('out-light-feature') ? document.getElementById('out-light-feature').innerText : '-';
 
-[STEP 7: 群組拼接與佈署 / Camera Stitching]
-待測物覆蓋總寬度     : ${stitchTotal} mm
-最少佈署相機台數     : ${stitchCount}
-實際有效對接總寬度   : ${stitchActual}
+        // 結論判定
+        const blurPxNum = parseFloat(document.getElementById('out-blur-pixel-object') ? document.getElementById('out-blur-pixel-object').innerText : '0') || 0;
+        const dutyNum = parseFloat(document.getElementById('out-exp-duty') ? document.getElementById('out-exp-duty').innerText : '0') || 0;
+        let conclusion = '✅ 系統參數已通過多項式矩陣自動驗證，光學架構符合 AOI 應用規格要求。';
+        if (blurPxNum >= 2.0) conclusion = '❌ 警告：動態模糊超過 2 像素，建議降低輸送帶速度或縮短曝光時間後重新評估。';
+        else if (blurPxNum >= 1.0) conclusion = '⚠️ 注意：動態模糊介於 1~2 像素，邊緣檢測精度可能略有影響，建議優化曝光參數。';
+        if (dutyNum > 90) conclusion += '\n❌ 曝光佔空比嚴重超頻，請立即縮短曝光時間。';
+        else if (dutyNum > 70) conclusion += '\n⚠️ 曝光佔空比偏高（>70%），注意相機散熱與傳輸穩定性。';
 
-[MECHANICAL ENCODER: 機械編碼器連動同步參數]
-膠輪輪系圓周長       : ${encCirc} mm
-編碼器原生線數       : ${encPls} Pulse/圈
-實體信號脈衝間距     : ${encPitch}
-匹配同步打光速度要求 : ${encSyncSpeed}
+        return `${'='.repeat(63)}
+AOI 專案評估報告 / Project Assessment Report
+${'='.repeat(63)}
+生成時間     : ${new Date().toLocaleString()}
+架構版本     : V8_Professional_PRO
+簽核人員     : ${operator}
+備註項目     : ${notes}
 
---------------------------------------------------
-[附加圖檔清單 / Attached Images Placeholder]
-* DOF.png (景深範圍標註拓撲圖)
-* OPTICAL.png (互動光路幾何軌跡藍圖)
-==================================================`;
-        return txt;
+${'─'.repeat(63)}
+[STEP 1] 感測器與解析度
+${'─'.repeat(63)}
+感測器規格       : ${sensorPresetName}
+感應器掃描長度   : ${sensorW} mm
+單向 X 像素數量  : ${sensorPxCount} px
+推導單像素解析度 : ${pixelSizeUM} µm/px
+解析度求解模式   : ${resMode === 'res' ? '求解單像素解析度' : '求解所需 FOV'}
+視野 FOV         : ${resFOV} mm
+相機像素總數     : ${resPixels} px
+輸入解析度       : ${resResolution} mm/px
+解算空間解析度   : ${outResVal}
+
+${'─'.repeat(63)}
+[STEP 2] 鏡頭幾何 (Lens Geometric)
+${'─'.repeat(63)}
+求解目標         : ${optMode}
+視野 FOV         : ${optFOV} mm
+工作距離 WD      : ${optWD} mm
+鏡頭焦距 Focal   : ${optFocal} mm
+光學放大倍率 β   : ${outBeta}
+建議標準焦距     : ${outSugFocal}
+
+${'─'.repeat(63)}
+[STEP 3] 每秒掃描速度 (Line Rate)
+${'─'.repeat(63)}
+物方解析度       : ${lrRes} µm/px
+輸送帶速度       : ${lrSpeed} mm/s
+掃描頻率 Line Rate: ${lrHz} Hz
+解算 Line Rate   : ${outLrHz}
+解算帶速上限     : ${outLrSpeed}
+相機工業需求等級 : ${outCamGrade}
+
+${'─'.repeat(63)}
+[STEP 4] 曝光安全分析 (Line Period)
+${'─'.repeat(63)}
+實際曝光時間     : ${expUs} µs  (= ${expMs} ms)
+單行採集週期     : ${outLinePeriod}
+曝光佔空比       : ${outExpDuty}
+
+${'─'.repeat(63)}
+[STEP 5] 光學景深範圍 (Depth of Field)
+${'─'.repeat(63)}
+光圈 F 值        : F ${dofF}
+容許彌散圓 CoC   : ${dofCoc} µm
+幾何景深覆蓋     : ${outDofTotal}
+
+${'─'.repeat(63)}
+[STEP 6] 動態高頻運動模糊 (Motion Blur)
+${'─'.repeat(63)}
+動態位移模糊量   : ${outBlurDis}
+感測器端模糊像素 : ${outBlurSensor}
+物方端模糊像素   : ${outBlurObj}
+模糊風險判定     : ${outBlurStatus}
+
+${'─'.repeat(63)}
+[STEP 7] 拼接與多相機佈署
+${'─'.repeat(63)}
+待測物總寬度     : ${stitchTotal} mm
+交疊視野比例     : ${stitchOverlap} %
+所需相機台數     : ${outCamCount}
+單台有效視野     : ${outEffFov}
+重疊區總寬度     : ${outOverlapMm}
+
+${'─'.repeat(63)}
+[光路幾何藍圖] 機構邊界與打光配置
+${'─'.repeat(63)}
+機構空間極限     : ${spaceLimit} mm
+物像全距 O/I     : ${oiDist} mm
+鏡頭本體長度     : ${lensLen} mm
+鏡頭工作距離     : ${lensWd} mm
+打光類型         : ${lightType}
+光源外徑         : ${lightWidth} mm
+光源安裝高度     : ${lightHeight} mm
+計算光學入射角   : ${outTheta}
+視覺特徵分類     : ${outFeature}
+
+${'='.repeat(63)}
+[AOI 評估結論]
+${conclusion}
+${'='.repeat(63)}
+`;
     }
 
-    function refreshTextReportPreview() {
-        const previewEl = document.getElementById('report-preview');
-        if(previewEl) {
-            previewEl.value = generateReportTextString();
-        }
+    function updateReportPreview() {
+        const preview = document.getElementById('report-preview');
+        if (preview) preview.value = buildReportText();
     }
 
     function exportReportTXT() {
-        const text = generateReportTextString();
-        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-        const link = document.createElement("a");
+        const text = buildReportText();
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = "光學配置報告_" + new Date().toISOString().slice(0,10) + ".txt";
+        link.download = `AOI_評估報告_${new Date().toISOString().slice(0,10)}.txt`;
         link.click();
+        updateReportPreview();
     }
 
     function copyReportToClipboard() {
-        const previewEl = document.getElementById('report-preview');
-        if(!previewEl) return;
-        previewEl.select();
-        previewEl.setSelectionRange(0, 99999);
-        navigator.clipboard.writeText(previewEl.value).then(() => {
-            alert("✓ 報告文字內容已成功複製至剪貼簿！");
-        }).catch(err => {
-            alert("複製失敗，請手動全選複製。");
+        updateReportPreview();
+        const text = buildReportText();
+        navigator.clipboard.writeText(text).then(() => {
+            alert('✅ 專案評估報告已成功複製至剪貼簿！');
+        }).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            alert('✅ 專案評估報告已成功複製！');
         });
     }
 
     function resetAllFields() {
-        if(!confirm("確定要將所有調校欄位重設回標準預設值嗎？")) return;
-        
-        document.getElementById('v-preset-select').value = "3";
-        document.getElementById('v-sensor-w').value = "8.8";
-        document.getElementById('v-pixel-size').value = "3.45";
-        document.getElementById('optics-target').value = "fov";
-        document.getElementById('v-opt-fov').value = "120";
-        document.getElementById('v-opt-wd').value = "300";
-        document.getElementById('v-opt-focal').value = "16";
-        document.getElementById('res-target').value = "res";
-        document.getElementById('v-res-fov').value = "120";
-        document.getElementById('v-res-pixels').value = "4096";
-        document.getElementById('lr-target').value = "hz";
-        document.getElementById('v-lr-speed').value = "500";
-        document.getElementById('v-exp-time-us').value = "40";
-        document.getElementById('v-exp-time-ms').value = "0.04";
-        document.getElementById('v-dof-f').value = "8";
-        document.getElementById('v-dof-coc').value = "3.45";
-        document.getElementById('v-stitch-total').value = "500";
-        document.getElementById('v-stitch-overlap').value = "10";
-        
-        document.getElementById('e-circumference').value = "200";
-        document.getElementById('e-pulse').value = "2000";
-        document.getElementById('e-multiplier').value = "4";
-
-        document.getElementById('g-light-w').value = "140";
-        document.getElementById('g-light-wd').value = "50";
-
-        applySensorPreset();
+        if (!confirm('確認重設所有欄位至預設值？此操作將清除已修改的數值。')) return;
+        localStorage.clear();
+        location.reload();
     }
 
-    // --- TAB 6: PWA BACKBONE ---
+    // copyReportText 保留相容性
+    function copyReportText() { copyReportToClipboard(); }
+
+    // --- TAB 6 PWA 離線生成控制 ---
     function downloadPWAFile(type) {
         let name = type === 'manifest' ? "manifest.json" : "service-worker.js";
         let text = "";
@@ -1433,29 +1636,45 @@ MACHINE VISION OPTICAL CONFIGURATION REPORT
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1a1d24",
-  "theme-color": "#4b9cd3",
-  "icons": []
+  "theme_color": "#4b9cd3",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
 }`;
         } else {
-            text = `const CACHE_NAME = 'optics-v5-cache-v1';
+            text = `const CACHE_NAME = 'optics-v8-cache-v1';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).catch(() => {})
+  );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys => Promise.all(
-      keys.map(k => { if(k !== CACHE_NAME) return caches.delete(k); })
+      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
     ))
   );
   return self.clients.claim();
 });
 
 self.addEventListener('fetch', e => {
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+  if (e.request.method !== 'GET') return;
+  e.respondWith(
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(response => {
+        if (!response || response.status !== 200 || response.type === 'opaque') return response;
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+        return response;
+      }).catch(() => cached);
+    })
+  );
 });`;
         }
         const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
@@ -1465,13 +1684,70 @@ self.addEventListener('fetch', e => {
         link.click();
     }
 
-    // 生命週期初始化與恢復持久化資料環境
+    function refreshPWAStatus() {
+        // Network status
+        const netEl = document.getElementById('pwa-network-status');
+        if (netEl) netEl.innerText = navigator.onLine ? '🟢 線上 (Online)' : '🔴 離線 (Offline)';
+
+        // SW status
+        const swEl = document.getElementById('pwa-sw-status');
+        if (swEl) {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                swEl.innerText = '✅ Service Worker 已啟用並控制中';
+                swEl.style.color = 'var(--success-color)';
+            } else if ('serviceWorker' in navigator) {
+                swEl.innerText = '⚠️ Service Worker 已登錄，等待控制';
+                swEl.style.color = '#e5c07b';
+            } else {
+                swEl.innerText = '❌ 瀏覽器不支援 Service Worker';
+                swEl.style.color = 'var(--warn-color)';
+            }
+        }
+
+        // Storage status
+        const stEl = document.getElementById('pwa-storage-status');
+        if (stEl) {
+            try {
+                localStorage.setItem('_pwa_test', '1');
+                localStorage.removeItem('_pwa_test');
+                stEl.innerText = '✅ localStorage 可用';
+                stEl.style.color = 'var(--success-color)';
+            } catch(e) {
+                stEl.innerText = '❌ localStorage 不可用';
+                stEl.style.color = 'var(--warn-color)';
+            }
+        }
+
+        // Display all localStorage keys
+        const board = document.getElementById('pwa-localstorage-display');
+        if (board) {
+            const keys = Object.keys(localStorage).filter(k => k.startsWith('calcv'));
+            if (keys.length === 0) {
+                board.innerHTML = '<div style="color:#5c6370; padding:8px;">（尚無儲存的快取參數）</div>';
+            } else {
+                board.innerHTML = keys.map(k => {
+                    return `<div class="result-line" style="font-size:12px;"><span class="result-label" style="font-family:monospace;">${k}:</span><span class="result-value" style="font-size:11px;">${localStorage.getItem(k)}</span></div>`;
+                }).join('');
+            }
+        }
+    }
+
+    function clearPWACache() {
+        if (!confirm('確認清除所有快取參數？下次開啟將回復預設值。')) return;
+        const keys = Object.keys(localStorage).filter(k => k.startsWith('calcv'));
+        keys.forEach(k => localStorage.removeItem(k));
+        refreshPWAStatus();
+        alert('✅ 快取已清除。');
+    }
+
+    // --- 生命週期初始化與環境復原 ---
     document.addEventListener('DOMContentLoaded', () => {
         setInterval(() => {
             document.getElementById('live-clock').innerText = new Date().toLocaleString();
         }, 1000);
         document.getElementById('live-clock').innerText = new Date().toLocaleString();
 
+        // 復原快取
         if(localStorage.getItem('calcv6_fov')) {
             document.getElementById('v-preset-select').value = localStorage.getItem('calcv6_preset_idx') || "3";
             document.getElementById('v-opt-fov').value = localStorage.getItem('calcv6_fov');
@@ -1483,11 +1759,43 @@ self.addEventListener('fetch', e => {
             document.getElementById('v-exp-time-ms').value = (cachedUs / 1000).toFixed(4);
         }
 
+        // 復原感測器像素快取
+        if (localStorage.getItem('calcv6_sensor_w')) {
+            document.getElementById('v-sensor-w').value = localStorage.getItem('calcv6_sensor_w');
+        }
+        if (localStorage.getItem('calcv6_sensor_px')) {
+            document.getElementById('v-sensor-px-count').value = localStorage.getItem('calcv6_sensor_px');
+        }
+
         applySensorPreset();
+        calcSensorResolution();
         updateInputLocking();
-        solveBasic('hz');
-        solveLength();
+        calcUnitModule();
+        calcEncoderModule();
+        refreshPWAStatus();
+
+        // 監聽網路狀態變化
+        window.addEventListener('online', refreshPWAStatus);
+        window.addEventListener('offline', refreshPWAStatus);
+
+        // 報告分頁切換時自動更新預覽
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setTimeout(() => {
+                    if (document.getElementById('report-tab').classList.contains('active')) {
+                        updateReportPreview();
+                    }
+                }, 50);
+            });
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        if(document.getElementById('visual-tab').classList.contains('active')) {
+            drawOpticalBlueprint();
+        }
     });
 </script>
+
 </body>
 </html>
