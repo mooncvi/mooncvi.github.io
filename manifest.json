@@ -1,12 +1,25 @@
 {
-  "name": "Machine Vision Optical Calculator",
-  "short_name": "光學計算機_V8_Professional PRO Edition",
+  "name": "光學計算機 PRO",
+  "short_name": "光學計算",
+  "description": "Machine Vision AOI 光學系統工程計算工具",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#1a1d24",
   "theme_color": "#4b9cd3",
+  "orientation": "any",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }
