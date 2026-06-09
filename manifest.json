@@ -1,13 +1,15 @@
 {
-  "name": "光學計算機 PRO",
-  "short_name": "光學計算",
-  "description": "Machine Vision AOI 光學系統工程計算工具",
-  "start_url": "./index.html",
+  "name": "AOI Optical Calculator V7",
+  "short_name": "AOI Calc",
+  "description": "AOI Optical Engineering Calculation Platform",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#1a1d24",
-  "theme_color": "#4b9cd3",
-  "orientation": "any",
+  "orientation": "portrait-primary",
+  "background_color": "#111111",
+  "theme_color": "#1976d2",
+  "lang": "zh-TW",
+
   "icons": [
     {
       "src": "icon-192.png",
