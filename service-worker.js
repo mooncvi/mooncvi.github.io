@@ -1,11 +1,11 @@
 /*
 =========================================
-AOI Optical Calculator V7
+AOI Optical Calculator V8
 Service Worker
 =========================================
 */
 
-const CACHE_NAME = 'aoi-optics-v7-cache-v1';
+const CACHE_NAME = 'aoi-optics-v8-cache-v1';
 
 const ASSETS_TO_CACHE = [
     './',
