@@ -34,12 +34,15 @@ self.addEventListener('activate', e => {
   );
   return self.clients.claim(); // 【關鍵】讓新版 Service Worker 立即接管當前網頁
 });
-
-// 3. 攔截請求：優先從快取抓取，沒有才走網路
-self.addEventListener('fetch', e => {
+  // HTML 主文件用網路優先（確保版本正確）
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+  // 其他資源（CSS/JS/圖片）快取優先
   e.respondWith(
-    caches.match(e.request).then(response => {
-      return response || fetch(e.request);
-    })
+    caches.match(e.request).then(response => response || fetch(e.request))
   );
 });
